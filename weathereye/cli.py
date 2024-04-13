@@ -3,13 +3,25 @@ import sys
 import click
 
 
-@click.command()
+@click.group()
 def main(args=None):
-    """Console script for weathereye."""
-    click.echo("Replace this message by putting your code into "
-               "weathereye.cli.main")
-    click.echo("See click documentation at https://click.palletsprojects.com/")
+    """weathereye command-line interface"""
     return 0
+
+
+# WeatherEye install command group
+@main.group()
+def install():
+    """WeatherEye install command"""
+    pass
+
+
+# command to install surface
+@install.command()
+def surface():
+    """Command to install Surface"""
+
+    click.echo("Installing surface...")
 
 
 if __name__ == "__main__":

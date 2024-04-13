@@ -32,6 +32,7 @@ setup(
     entry_points={
         'console_scripts': [
             'weathereye=weathereye.cli:main',
+            'wx=weathereye.cli:main',
         ],
     },
     install_requires=requirements,

@@ -19,9 +19,9 @@ def install():
 # command to install surface
 @install.command()
 def surface():
-    """Command to install Surface"""
+    """Command to install SURFACE CDMS"""
 
-    click.echo("Installing surface...")
+    click.echo("Installing surface CDMS...")
 
 
 if __name__ == "__main__":

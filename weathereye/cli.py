@@ -36,6 +36,7 @@ def surface():
         return
 
     # begin surface cdms installation
+    click.echo(click.style(f"{host_system, host_name, host_version} is compatible with surface CDMS", fg='blue', bold=True))
     click.echo("Installing surface CDMS...")
 
 

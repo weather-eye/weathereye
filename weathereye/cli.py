@@ -1,5 +1,7 @@
 """Console script for weathereye."""
 import sys
+from platform import system
+from distro import id, version
 import click
 
 
@@ -21,7 +23,21 @@ def install():
 def surface():
     """Command to install SURFACE CDMS"""
 
-    click.echo("Installing surface CDMS...")
+    # check if OS is supported before install
+    host_system = system().lower()
+    host_name = id()
+    host_version = version()
+
+    if host_system != 'linux':
+        
+        click.echo(f"{('macOS' if host_name == 'darwin' else host_name), host_version} is not currently supported for SURFACE CDMS")
+        click.echo(click.style("see docs.weathereye.org for supported operating systems", fg='red', bold=True))
+
+        return
+
+    # begin surface cdms installation
+    click.echo(click.style(f"{host_system, host_name, host_version} is compatible with surface CDMS", fg='blue', bold=True))
+    click.echo("Installing SURFACE CDMS...")
 
 
 if __name__ == "__main__":

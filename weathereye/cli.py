@@ -30,14 +30,14 @@ def surface():
 
     if host_system != 'linux':
         
-        click.echo(f"{('macOS' if host_name == 'darwin' else host_name), host_version} is not currently supported for surface CDMS")
+        click.echo(f"{('macOS' if host_name == 'darwin' else host_name), host_version} is not currently supported for SURFACE CDMS")
         click.echo(click.style("see docs.weathereye.org for supported operating systems", fg='red', bold=True))
 
         return
 
     # begin surface cdms installation
     click.echo(click.style(f"{host_system, host_name, host_version} is compatible with surface CDMS", fg='blue', bold=True))
-    click.echo("Installing surface CDMS...")
+    click.echo("Installing SURFACE CDMS...")
 
 
 if __name__ == "__main__":

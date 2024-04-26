@@ -20,10 +20,24 @@ WeatherEye Python Package and Command Line Interface (CLI)
 * Free software: MIT license
 * Documentation: https://docs.weathereye.org
 
+
+Supported Operating Systems
+---------------------------
+Linux
+
+* ``Ubuntu 22.04``
+
+
 Install
 -------
 
 To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
+
+.. code-block::
+
+    pipx ensurepath
+
+Ensure to run after installing pipx to make sure that the directory where pipx stores applications are included in your PATH. Make sure you close the terminal and reopen it for changes to take effect.
 
 .. code-block::
 

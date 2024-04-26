@@ -1,8 +1,12 @@
 """Console script for weathereye."""
 import sys
-from platform import system
-from distro import id, version
 import click
+import logging
+
+import weathereye.execute_playbooks as ex
+from weathereye.utils import supported_os as so
+
+logger = logging.getLogger(__name__)
 
 
 @click.group()
@@ -21,22 +25,22 @@ def install():
 # command to install surface
 @install.command()
 def surface():
+    # Confirm SURFACE CDMS install with user
+    if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies. Proceed?", fg='yellow', bold=True)):
+        return
+
     """Command to install SURFACE CDMS"""
+    logger.info("Attempting to install SURFACE CDMS")
 
-    # check if OS is supported before install
-    host_system = system().lower()
-    host_name = id()
-    host_version = version()
+    # check if OS is supported before surface cdms install
+    if so.check_sys():
+        return
 
-    if host_system != 'linux':
-        
-        click.echo(f"{('macOS' if host_name == 'darwin' else host_name), host_version} is not currently supported for SURFACE CDMS")
-        click.echo(click.style("see docs.weathereye.org for supported operating systems", fg='red', bold=True))
-
+    # install docker
+    if not ex.run_docker_playbook():
         return
 
     # begin surface cdms installation
-    click.echo(click.style(f"{host_system, host_name, host_version} is compatible with surface CDMS", fg='blue', bold=True))
     click.echo("Installing SURFACE CDMS...")
 
 

@@ -1,6 +1,6 @@
 ---
 - name: Install Docker
-  hosts: localhost
+  hosts: all
   become: true # granting root privileges
   vars:
     ansible_become_password: "{{ sudo_password }}"

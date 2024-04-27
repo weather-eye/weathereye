@@ -22,14 +22,13 @@ def install():
     pass
 
 
-# command to install surface
+# command to install surface cdms
 @install.command()
 def surface():
     # Confirm SURFACE CDMS install with user
     if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies. Proceed?", fg='yellow', bold=True)):
         return
 
-    """Command to install SURFACE CDMS"""
     logger.info("Attempting to install SURFACE CDMS")
 
     # check if OS is supported before surface cdms install
@@ -38,11 +37,31 @@ def surface():
 
     # install docker
     if not ex.run_docker_playbook():
-        return
+        return 
 
     # begin surface cdms installation
     click.echo("Installing SURFACE CDMS...")
 
+
+# command to install surface on a romote machine
+@install.command()
+def remote_surface():
+    # Confirm remote SURFACE CDMS install with user
+    if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies on remote systems. Proceed?", fg='yellow', bold=True)):
+        return
+    
+    logger.info("Attempting to install SURFACE CDMS on a remote machine")
+
+    # check if OS is supported before surface cdms install
+    ##########
+
+    # install docker
+    if not ex.remote_run_docker_playbook():
+        return 
+    
+    # begin surface cdms installation
+    click.echo("Installing SURFACE CDMS...")
+    
 
 if __name__ == "__main__":
     sys.exit(main())  # pragma: no cover

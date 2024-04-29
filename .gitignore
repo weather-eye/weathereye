@@ -20,8 +20,8 @@ lib64/
 parts/
 sdist/
 var/
-weathereye/logs/
-weathereye/playbooks/ansible_custom.cfg
+weathereye/logs/app.log
+weathereye/logs/ansible.log
 weathereye/playbooks/inventory
 wheels/
 *.egg-info/

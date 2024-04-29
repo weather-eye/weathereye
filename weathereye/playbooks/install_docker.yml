@@ -2,14 +2,10 @@
 - name: Install Docker
   hosts: all
   become: true # granting root privileges
-  vars:
-    ansible_become_password: "{{ sudo_password }}"
 
   tasks:
-      - name: Install aptitude
+      - name: Update apt cache
         apt:
-          name: aptitude
-          state: latest
           update_cache: true
 
       - name: Install required system packages
@@ -23,7 +19,6 @@
             - virtualenv
             - python3-setuptools
           state: latest
-          update_cache: true
 
       - name: Add Docker GPG apt Key
         apt_key:
@@ -39,7 +34,6 @@
         apt:
           name: docker-ce
           state: latest
-          update_cache: true
 
       - name: Install Docker Module for Python
         pip:

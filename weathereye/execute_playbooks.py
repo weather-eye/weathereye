@@ -1,13 +1,24 @@
 import os
 import logging
 import click
-import ansible_runner
-import getpass
+import subprocess
 
 logger = logging.getLogger(__name__)
 
-# playbooks folder path
-playbooks_path = os.path.dirname(__file__) + "/playbooks"
+# getting path to the weathereye virtual environment activate script
+venv_activate_script = os.path.dirname(__file__) # current script's directory
+levels_up = 4 # number of directory levels to go up
+for _ in range(levels_up):
+    venv_activate_script = os.path.dirname(venv_activate_script)
+
+# path to activate script for weathereye venv
+venv_activate_script += "/bin/activate"
+
+# path to Ansible config file
+ansible_config_path = os.path.dirname(__file__) + "/playbooks/ansible.cfg"
+
+# path to Ansible config file
+localhost_ansible_config_path = os.path.dirname(__file__) + "/playbooks/ansible-localhost.cfg"
 
 # docker playbook path
 docker_playbook_path = os.path.dirname(__file__) + "/playbooks/install_docker.yml"
@@ -18,17 +29,18 @@ def run_docker_playbook():
     logging.warning("Attempting to execute docker playbook...")
 
     try:
-        # prompt user for sudo password then run playbook
-        ans_run = ansible_runner.run(playbook=docker_playbook_path,
-                                     extravars={"user":getpass.getuser(),
-                                                "sudo_password":getpass.getpass(f"[sudo] password for {getpass.getuser()}: "),
-                                                })
+        # build the command to activate the venv and run Docker playbook
+        ansible_command = [
+            f"ANSIBLE_CONFIG={localhost_ansible_config_path}",
+            "ansible-playbook",
+            docker_playbook_path,
+        ]
 
-        logging.info(f"docker install {ans_run.status}")
+        # combine activation and Ansible command into a single command
+        activate_and_run_command = f"source {venv_activate_script} && {' '.join(ansible_command)}"
 
-        # throwing an exception if docker install was not successful
-        if ans_run.status != "successful":
-            raise Exception("Docker install failed.")
+        # run the combined command as a subprocess
+        subprocess.run(activate_and_run_command, shell=True)
 
         return True
 
@@ -46,18 +58,18 @@ def remote_run_docker_playbook():
     logging.warning("Attempting to execute docker playbook...")
 
     try:
-        # prompt user for sudo password then run playbook
-        ans_run = ansible_runner.run(playbook=docker_playbook_path,
-                                     extravars={"user":getpass.getuser(),
-                                                "sudo_password":getpass.getpass(f"[sudo] password for {getpass.getuser()}: "),
-                                                },
-                                     private_data_dir=playbooks_path)
+        # build the command to activate the venv and run Docker playbook
+        ansible_command = [
+            f"ANSIBLE_CONFIG={ansible_config_path}",
+            "ansible-playbook",
+            docker_playbook_path,
+        ]
 
-        logging.info(f"docker install {ans_run.status}")
+        # combine activation and Ansible command into a single command
+        activate_and_run_command = f"source {venv_activate_script} && {' '.join(ansible_command)}"
 
-        # throwing an exception if docker install was not successful
-        if ans_run.status != "successful":
-            raise Exception("Docker install failed.")
+        # run the combined command as a subprocess
+        subprocess.run(activate_and_run_command, shell=True)
 
         return True
 

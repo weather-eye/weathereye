@@ -1,0 +1,42 @@
+---
+- name: Install Docker
+  hosts: localhost
+  become: true # granting root privileges
+
+  tasks:
+      - name: Update apt cache
+        apt:
+          update_cache: true
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Install required system packages
+        apt:
+          pkg:
+            - apt-transport-https
+            - ca-certificates
+            - curl
+            - software-properties-common
+            - python3-pip
+            - virtualenv
+            - python3-setuptools
+          state: latest
+
+      - name: Add Docker GPG apt Key
+        apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+
+      - name: Add Docker Repository
+        apt_repository:
+          repo: deb https://download.docker.com/linux/ubuntu jammy stable
+          state: present
+
+      - name: Install docker-ce
+        apt:
+          name: docker-ce
+          state: latest
+
+      - name: Install Docker Module for Python
+        pip:
+          name: docker

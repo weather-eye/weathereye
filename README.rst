@@ -54,9 +54,26 @@ To download and install the most recent updates from GitHub (note this installs 
 Features
 --------
 
-Currently the weathereye commandline tool is limited to:
+Currently, the weathereye command line tool is limited to:
 
 * ``wx install surface`` - Install SURFACE CDMS
+
+* ``wx install surface-remote`` - Install SURFACE CDMS on a remote machine
+
+
+Usage
+-----
+
+Before running any commands, activate the weathereye virtual environment created by pipx:
+
+1. Find the virtual environment path: 
+   * Run ``pipx list`` which will show a path like ``path/to/venvs/weathereye``.
+
+2. Activate the environment: 
+   * ``source path/to/venvs/weathereye/bin/activate``
+
+3. Deactivate the environment: 
+   * ``deactivate``
 
 ..
     Credits

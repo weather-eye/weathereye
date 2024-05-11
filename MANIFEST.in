@@ -4,7 +4,6 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 include weathereye/playbooks/*
-include weathereye/logs/*
 
 recursive-include tests *
 recursive-exclude * __pycache__

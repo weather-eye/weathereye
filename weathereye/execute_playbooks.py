@@ -1,9 +1,6 @@
 import os
-import logging
 import click
 import subprocess
-
-logger = logging.getLogger(__name__)
 
 # getting path to the weathereye virtual environment activate script
 venv_activate_script = os.path.dirname(__file__) # current script's directory
@@ -29,8 +26,6 @@ surface_remote_playbook_path = os.path.dirname(__file__) + "/playbooks/install_s
 
 # execute surface playbook
 def run_surface_playbook():
-    logging.warning("Attempting to execute SURFACE playbook...")
-
     try:
         # build the command to run SURFACE playbook
         ansible_command = [
@@ -45,18 +40,16 @@ def run_surface_playbook():
         return True
 
     except Exception as error:
-        logging.error(f"SURFACE playbook install failed...{error}")
 
         click.echo(click.style("An error occured during SURFACE playbook installation.", fg='yellow', bold=True))
-        click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red', bold=True))
+        click.echo(click.style("see docs.weathereye.org for project documentation.", fg='yellow', bold=True))
+        click.echo(click.style(f"{error}", fg='red'))
         
         return False
     
 
 # execute surface playbook on remote machines
 def remote_run_surface_playbook():
-    logging.warning("Attempting to execute SURFACE playbook...")
-
     try:
         # build the command to activate the venv and run SURFACE playbook
         ansible_command = [
@@ -77,9 +70,9 @@ def remote_run_surface_playbook():
         return True
 
     except Exception as error:
-        logging.error(f"SURFACE playbook install failed...{error}")
-
+       
         click.echo(click.style("An error occured during SURFACE playbook installation.", fg='yellow', bold=True))
-        click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red', bold=True))
+        click.echo(click.style("see docs.weathereye.org for project documentation.", fg='yellow', bold=True))
+        click.echo(click.style(f"{error}", fg='red'))
         
         return False

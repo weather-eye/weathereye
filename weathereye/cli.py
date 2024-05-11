@@ -1,12 +1,8 @@
 """Console script for weathereye."""
 import sys
 import click
-import logging
 
 import weathereye.execute_playbooks as ex
-from weathereye.utils import supported_os as so
-
-logger = logging.getLogger(__name__)
 
 
 @click.group()
@@ -29,12 +25,6 @@ def surface():
     if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies. Proceed?", fg='yellow', bold=True)):
         return
 
-    logger.info("Attempting to install SURFACE CDMS")
-
-    # check if OS is supported before surface cdms install
-    if so.check_sys():
-        return
-
     # begin surface cdms installation
     click.echo("Installing SURFACE CDMS...")
 
@@ -49,11 +39,6 @@ def surface_remote():
     # Confirm remote SURFACE CDMS install with user
     if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies on remote systems. Proceed?", fg='yellow', bold=True)):
         return
-    
-    logger.info("Attempting to install SURFACE CDMS on a remote machine")
-
-    # check if OS is supported before surface cdms install
-    ##########
     
     # begin surface cdms installation
     click.echo("Installing SURFACE CDMS...")

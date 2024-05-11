@@ -4,6 +4,15 @@
   become: true # granting root privileges
 
   tasks:
+      - name: System Facts
+        ansible.builtin.debug:
+          msg: "{{ ansible_os_family }}, {{ ansible_distribution }}, {{ ansible_distribution_version }}"
+        
+      - name: Check Supported Systems
+        ansible.builtin.fail:
+          msg: System is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+        when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
+
       - name: Update apt cache
         apt:
           update_cache: true

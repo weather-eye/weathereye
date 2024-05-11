@@ -17,23 +17,26 @@ venv_activate_script += "/bin/activate"
 # path to Ansible config file
 ansible_config_path = os.path.dirname(__file__) + "/playbooks/ansible.cfg"
 
-# path to Ansible config file
+# path to Ansible config file for localhost
 localhost_ansible_config_path = os.path.dirname(__file__) + "/playbooks/ansible-localhost.cfg"
 
-# docker playbook path
-docker_playbook_path = os.path.dirname(__file__) + "/playbooks/install_docker.yml"
+# surface playbook path
+surface_playbook_path = os.path.dirname(__file__) + "/playbooks/install_surface.yml"
+
+# surface remote playbook path
+surface_remote_playbook_path = os.path.dirname(__file__) + "/playbooks/install_surface_remote.yml"
 
 
-# execute docker playbook
-def run_docker_playbook():
-    logging.warning("Attempting to execute docker playbook...")
+# execute surface playbook
+def run_surface_playbook():
+    logging.warning("Attempting to execute SURFACE playbook...")
 
     try:
-        # build the command to activate the venv and run Docker playbook
+        # build the command to run SURFACE playbook
         ansible_command = [
             f"ANSIBLE_CONFIG={localhost_ansible_config_path}",
             "ansible-playbook",
-            docker_playbook_path,
+            surface_playbook_path,
         ]
 
         # run the combined command as a subprocess
@@ -42,24 +45,24 @@ def run_docker_playbook():
         return True
 
     except Exception as error:
-        logging.error(f"docker playbook install failed...{error}")
+        logging.error(f"SURFACE playbook install failed...{error}")
 
-        click.echo(click.style("An error occured during docker playbook installation.", fg='yellow', bold=True))
+        click.echo(click.style("An error occured during SURFACE playbook installation.", fg='yellow', bold=True))
         click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red', bold=True))
         
         return False
     
 
-# execute docker playbook on remote machines
-def remote_run_docker_playbook():
-    logging.warning("Attempting to execute docker playbook...")
+# execute surface playbook on remote machines
+def remote_run_surface_playbook():
+    logging.warning("Attempting to execute SURFACE playbook...")
 
     try:
-        # build the command to activate the venv and run Docker playbook
+        # build the command to activate the venv and run SURFACE playbook
         ansible_command = [
             f"ANSIBLE_CONFIG={ansible_config_path}",
             "ansible-playbook",
-            docker_playbook_path,
+            surface_remote_playbook_path,
         ]
 
         # # combine activation and Ansible command into a single command
@@ -67,16 +70,16 @@ def remote_run_docker_playbook():
 
         # # run the combined command as a subprocess
         # subprocess.run(activate_and_run_command, shell=True)
-        
+
         # run the combined command as a subprocess
         subprocess.run(' '.join(ansible_command), shell=True)
 
         return True
 
     except Exception as error:
-        logging.error(f"docker playbook install failed...{error}")
+        logging.error(f"SURFACE playbook install failed...{error}")
 
-        click.echo(click.style("An error occured during docker playbook installation.", fg='yellow', bold=True))
+        click.echo(click.style("An error occured during SURFACE playbook installation.", fg='yellow', bold=True))
         click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red', bold=True))
         
         return False

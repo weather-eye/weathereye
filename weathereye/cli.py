@@ -35,12 +35,12 @@ def surface():
     if so.check_sys():
         return
 
-    # install docker
-    if not ex.run_docker_playbook():
-        return 
-
     # begin surface cdms installation
     click.echo("Installing SURFACE CDMS...")
+
+    # install SURFACE
+    if not ex.run_surface_playbook():
+        return
 
 
 # command to install surface on a romote machine
@@ -54,13 +54,13 @@ def surface_remote():
 
     # check if OS is supported before surface cdms install
     ##########
-
-    # install docker
-    if not ex.remote_run_docker_playbook():
-        return 
     
     # begin surface cdms installation
     click.echo("Installing SURFACE CDMS...")
+
+    # install SURFACE
+    if not ex.remote_run_surface_playbook():
+        return
     
 
 if __name__ == "__main__":

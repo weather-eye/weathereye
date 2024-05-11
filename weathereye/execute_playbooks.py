@@ -36,11 +36,8 @@ def run_docker_playbook():
             docker_playbook_path,
         ]
 
-        # combine activation and Ansible command into a single command
-        activate_and_run_command = f"source {venv_activate_script} && {' '.join(ansible_command)}"
-
         # run the combined command as a subprocess
-        subprocess.run(activate_and_run_command, shell=True)
+        subprocess.run(ansible_command, shell=True)
 
         return True
 

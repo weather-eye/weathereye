@@ -45,7 +45,7 @@ def surface():
 
 # command to install surface on a romote machine
 @install.command()
-def remote_surface():
+def surface_remote():
     # Confirm remote SURFACE CDMS install with user
     if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies on remote systems. Proceed?", fg='yellow', bold=True)):
         return

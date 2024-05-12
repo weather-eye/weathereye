@@ -49,11 +49,12 @@ def run_surface_playbook():
     
 
 # execute surface playbook on remote machines
-def remote_run_surface_playbook():
+def remote_run_surface_playbook(hosts_list):
     try:
         # build the command to activate the venv and run SURFACE playbook
         ansible_command = [
             f"ANSIBLE_CONFIG={ansible_config_path}",
+            f"ANSIBLE_INVENTORY={hosts_list}",
             "ansible-playbook",
             surface_remote_playbook_path,
         ]

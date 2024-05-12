@@ -35,7 +35,8 @@ def surface():
 
 # command to install surface on a romote machine
 @install.command()
-def surface_remote():
+@click.option('--hosts_list', prompt='Hosts list ABSOLUTE path', required=True, type=str, help='The absolute path to the list of hosts to install surface on.')
+def surface_remote(hosts_list):
     # Confirm remote SURFACE CDMS install with user
     if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies on remote systems. Proceed?", fg='yellow', bold=True)):
         return
@@ -44,7 +45,7 @@ def surface_remote():
     click.echo("Installing SURFACE CDMS...")
 
     # install SURFACE
-    if not ex.remote_run_surface_playbook():
+    if not ex.remote_run_surface_playbook(hosts_list):
         return
     
 

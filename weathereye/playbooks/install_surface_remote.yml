@@ -3,6 +3,11 @@
   hosts: all
   become: true # granting root privileges
 
+  vars_prompt:
+      - name: surface_repo_path
+        prompt: "Path to a folder on the remote machine to clone the SURFACE Repository"
+        private: no
+
   tasks:
       - name: System Facts
         ansible.builtin.debug:
@@ -49,3 +54,12 @@
       - name: Install Docker Module for Python
         pip:
           name: docker
+
+      - name: Clone SURFACE Repository
+        git:
+          repo: https://github.com/opencdms/surface.git
+          dest: "{{ surface_repo_path }}"
+
+      - name: Configure environment variables
+        ansible.builtin.pause:
+          prompt: IMPORTANT! Configure environment variables in ‘surface/api/production.env’ file before moving on. Then press ENTER. (see Step 3 of SURFACE installation guide)

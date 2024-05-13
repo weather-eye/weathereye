@@ -3,63 +3,99 @@
   hosts: all
   become: true # granting root privileges
 
-  vars_prompt:
-      - name: surface_repo_path
-        prompt: "Path to a folder on the remote machine to clone the SURFACE Repository"
-        private: no
+  tasks:           
+      - name: Get SURFACE repo path
+        ansible.builtin.pause:
+          prompt: "Enter the Absolute Path to a folder on the remote machine to clone the SURFACE Repository"
+        register: surface_repo_path
 
-  tasks:
-      - name: System Facts
-        ansible.builtin.debug:
-          msg: "{{ ansible_os_family }}, {{ ansible_distribution }}, {{ ansible_distribution_version }}"
+      - name: Start SURFACE with data
+        ansible.builtin.pause:
+          prompt: "Do you want to start containers with data? (yes/no)"
+        register: with_data
+        until: with_data.user_input in ['yes', 'no']
+        delay: 2
+
+      - name: Get data file path
+        ansible.builtin.pause:
+          prompt: "Enter the Absolute Path to the data file"
+        register: data_path
+        when: with_data.user_input == "yes"
+
+      # - name: System Facts
+      #   ansible.builtin.debug:
+      #     msg: "{{ ansible_os_family }}, {{ ansible_distribution }}, {{ ansible_distribution_version }}"
         
-      - name: Check Supported Systems
-        ansible.builtin.fail:
-          msg: The hosts system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
-        when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
+      # - name: Check Supported Systems
+      #   ansible.builtin.fail:
+      #     msg: The hosts system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+      #   when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
 
-      - name: Update apt cache
-        apt:
-          update_cache: true
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
+      # - name: Update apt cache
+      #   apt:
+      #     update_cache: true
+      #   retries: 2
+      #   delay: 60 # Wait 1 minute between retires
 
-      - name: Install required system packages
-        apt:
-          pkg:
-            - apt-transport-https
-            - ca-certificates
-            - curl
-            - software-properties-common
-            - python3-pip
-            - virtualenv
-            - python3-setuptools
-          state: latest
+      # - name: Install required system packages
+      #   apt:
+      #     pkg:
+      #       - apt-transport-https
+      #       - ca-certificates
+      #       - curl
+      #       - software-properties-common
+      #       - python3-pip
+      #       - virtualenv
+      #       - python3-setuptools
+      #     state: latest
 
-      - name: Add Docker GPG apt Key
-        apt_key:
-          url: https://download.docker.com/linux/ubuntu/gpg
-          state: present
+      # - name: Add Docker GPG apt Key
+      #   apt_key:
+      #     url: https://download.docker.com/linux/ubuntu/gpg
+      #     state: present
 
-      - name: Add Docker Repository
-        apt_repository:
-          repo: deb https://download.docker.com/linux/ubuntu jammy stable
-          state: present
+      # - name: Add Docker Repository
+      #   apt_repository:
+      #     repo: deb https://download.docker.com/linux/ubuntu jammy stable
+      #     state: present
 
-      - name: Install docker-ce
-        apt:
-          name: docker-ce
-          state: latest
+      # - name: Install docker-ce
+      #   apt:
+      #     name: docker-ce
+      #     state: latest
 
-      - name: Install Docker Module for Python
-        pip:
-          name: docker
+      # - name: Install Docker Module for Python
+      #   pip:
+      #     name: docker
 
-      - name: Clone SURFACE Repository
-        git:
-          repo: https://github.com/opencdms/surface.git
-          dest: "{{ surface_repo_path }}"
+      # - name: Clone SURFACE Repository
+      #   git:
+      #     repo: https://github.com/opencdms/surface.git
+      #     dest: "{{ surface_repo_path }}"
 
-      - name: Configure environment variables
+      - name: Configure Environment Variables
         ansible.builtin.pause:
           prompt: IMPORTANT! Configure environment variables in ‘surface/api/production.env’ file before moving on. Then press ENTER. (see Step 3 of SURFACE installation guide)
+
+      - name: Building Docker images
+        ansible.builtin.command: docker compose build
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
+
+      - name: Start Docker Containers
+        ansible.builtin.command: docker compose up postgres cache redis api
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
+        async: 7200
+        poll: 0
+
+      - name: Start Without Data
+        ansible.builtin.command: docker compose exec api bash load_initial_data.sh
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
+
+      - name: Start With Data
+        ansible.builtin.command: docker compose exec -T postgres psql -U dba -d surface_db < {{ data_path.user_input }}
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
+        when: with_data.user_input == "yes"

@@ -75,7 +75,11 @@ Usage
 * Deactivate the environment: 
    ``deactivate``
 
-2. **When installing SURFACE on remote machines you will be prompted to provide a hosts list:**
+2. **When installing SURFACE on remote machines make sure openssh-server is installed on the remote machines:**
+
+* To download openssh-server run: ``sudo apt install openssh-server``
+
+3. **When installing SURFACE on remote machines you will be prompted to provide a hosts list:**
 
 * Create a host list file:
     * Create a YAML file (``.yml`` extension) containing the hostnames or IP addresses of the remote machines.

@@ -75,9 +75,9 @@ Usage
 * Deactivate the environment: 
    ``deactivate``
 
-2. **When installing SURFACE on remote machines make sure openssh-server is installed on the remote machines:**
+2. **Enable SSH connections for remote machines:**
 
-* To download openssh-server run: ``sudo apt install openssh-server``
+* To download SURFACE on remote machines, make sure the remote machines can be accessed via SSH.
 
 3. **When installing SURFACE on remote machines you will be prompted to provide a hosts list:**
 

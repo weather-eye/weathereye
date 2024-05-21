@@ -3,16 +3,30 @@
   hosts: localhost
   become: true # granting root privileges
 
-  tasks:
-      - name: System Facts
-        ansible.builtin.debug:
-          msg: "{{ ansible_os_family }}, {{ ansible_distribution }}, {{ ansible_distribution_version }}"
-        
+  tasks:  
       - name: Check Supported Systems
         ansible.builtin.fail:
-          msg: System is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+          msg: The hosts system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
         when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
+     
+      - name: Get SURFACE repo path
+        ansible.builtin.pause:
+          prompt: Enter the Absolute Path of a folder to clone the SURFACE Repository
+        register: surface_repo_path
 
+      - name: Start SURFACE with data
+        ansible.builtin.pause:
+          prompt: Do you want to start containers with data? (yes/no)
+        register: with_data
+        until: with_data.user_input in ['yes', 'no', 'Yes', 'No', 'YES', 'NO']
+        delay: 2
+
+      - name: Get data file path
+        ansible.builtin.pause:
+          prompt: Enter the Absolute Path to the data file
+        register: data_path
+        when: with_data.user_input == "yes"
+ 
       - name: Update apt cache
         apt:
           update_cache: true
@@ -49,3 +63,115 @@
       - name: Install Docker Module for Python
         pip:
           name: docker
+
+      - name: Clone SURFACE Repository
+        ansible.builtin.git:
+          repo: https://github.com/opencdms/surface.git
+          dest: "{{ surface_repo_path.user_input }}"
+        become: false
+
+      - name: Configure Environment Variables
+        ansible.builtin.pause:
+          prompt: IMPORTANT! Configure environment variables in ‘surface/api/production.env’ file before moving on. Then press ENTER. (see Step 3 of SURFACE installation guide)
+
+      - name: Creating and starting Docker services
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path.user_input }}"
+          files: docker-compose.yml
+          build: always
+          state: present
+          services:
+            - postgres
+            - cache
+            - redis
+            - api
+        async: 7200
+        poll: 0
+        register: docker_services_output
+
+      - name: Docker services
+        ansible.builtin.async_status:
+          jid: "{{ docker_services_output.ansible_job_id }}"
+        register: docker_services_progress
+        until: docker_services_progress.finished
+        retries: 100
+        delay: 120
+
+      - name: Start Without Data
+        community.docker.docker_container_exec:
+          container: surface-api
+          command: bash load_initial_data.sh
+        when: with_data.user_input in ['no', 'No', 'NO']
+        async: 7200
+        poll: 0
+        register: start_without_data
+
+      - name: Starting without data
+        ansible.builtin.async_status:
+          jid: "{{ start_without_data.ansible_job_id }}"
+        when: with_data.user_input in ['no', 'No', 'NO']
+        register: start_without_data_progress
+        until: start_without_data_progress.finished
+        retries: 100
+        delay: 120
+
+      - name: Start With Data
+        community.docker.docker_container_exec:
+          container: surface-database
+          command: sh -c 'psql -U dba -d surface_db < {{ data_path.user_input }}'
+        when: with_data.user_input in ['yes', 'Yes', 'YES']
+        async: 7200
+        poll: 0
+        register: start_with_data
+
+      - name: Starting with data
+        ansible.builtin.async_status:
+          jid: "{{ start_with_data.ansible_job_id }}"
+        when: with_data.user_input in ['yes', 'Yes', 'YES']
+        register: start_with_data_progress
+        until: start_with_data_progress.finished
+        retries: 100
+        delay: 120
+
+      - name: Collect static files
+        community.docker.docker_container_exec:
+          container: surface-api
+          command: python manage.py collectstatic --noinput
+
+      - name: Create admin username
+        ansible.builtin.pause:
+          prompt: Admin Username
+        register: django_username
+
+      - name: Create admin email address
+        ansible.builtin.pause:
+          prompt: Admin Email Address
+        register: django_email
+
+      - name: Create admin password
+        ansible.builtin.pause:
+          prompt: Admin password
+          echo: no
+        register: django_password
+
+      - name: Create admin user
+        community.docker.docker_container_exec:
+          container: surface-api
+          env: 
+            DJANGO_SUPERUSER_PASSWORD: "{{ django_password.user_input }}"
+          user: surface
+          command: python manage.py createsuperuser --username {{ django_username.user_input }} --email {{ django_email.user_input }} --noinput
+
+      - name: Stopping all containers
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path.user_input }}"
+          state: stopped
+
+      - name: Starting up SURFACE
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path.user_input }}"
+          state: present
+
+      - name: Open SURFACE
+        ansible.builtin.pause:
+          prompt: SURFACE install complete. SURFACE can now be opened in the browser

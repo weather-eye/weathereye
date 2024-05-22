@@ -42,6 +42,7 @@
             - software-properties-common
             - python3-pip
             - virtualenv
+            - git
             - python3-setuptools
           state: latest
 

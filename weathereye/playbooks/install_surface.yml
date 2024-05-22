@@ -6,7 +6,7 @@
   tasks:  
       - name: Check Supported Systems
         ansible.builtin.fail:
-          msg: The hosts system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+          msg: This host system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
         when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
      
       - name: Get SURFACE repo path

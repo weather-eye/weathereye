@@ -102,36 +102,12 @@
           container: surface-api
           command: bash load_initial_data.sh
         when: with_data.user_input in ['no', 'No', 'NO']
-        async: 7200
-        poll: 0
-        register: start_without_data
-
-      - name: Starting without data
-        ansible.builtin.async_status:
-          jid: "{{ start_without_data.ansible_job_id }}"
-        when: with_data.user_input in ['no', 'No', 'NO']
-        register: start_without_data_progress
-        until: start_without_data_progress.finished
-        retries: 100
-        delay: 120
 
       - name: Start With Data
         community.docker.docker_container_exec:
           container: surface-database
           command: sh -c 'psql -U dba -d surface_db < {{ data_path.user_input }}'
         when: with_data.user_input in ['yes', 'Yes', 'YES']
-        async: 7200
-        poll: 0
-        register: start_with_data
-
-      - name: Starting with data
-        ansible.builtin.async_status:
-          jid: "{{ start_with_data.ansible_job_id }}"
-        when: with_data.user_input in ['yes', 'Yes', 'YES']
-        register: start_with_data_progress
-        until: start_with_data_progress.finished
-        retries: 100
-        delay: 120
 
       - name: Collect static files
         community.docker.docker_container_exec:

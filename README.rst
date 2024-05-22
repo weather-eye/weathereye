@@ -75,7 +75,11 @@ Usage
 * Deactivate the environment: 
    ``deactivate``
 
-2. **When installing SURFACE on remote machines you will be prompted to provide a hosts list:**
+2. **Enable SSH connections for remote machines:**
+
+* To download SURFACE on remote machines, make sure the remote machines can be accessed via SSH.
+
+3. **When installing SURFACE on remote machines you will be prompted to provide a hosts list:**
 
 * Create a host list file:
     * Create a YAML file (``.yml`` extension) containing the hostnames or IP addresses of the remote machines.

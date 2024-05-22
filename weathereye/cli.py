@@ -1,8 +1,8 @@
 """Console script for weathereye."""
 import sys
-from platform import system
-from distro import id, version
 import click
+
+import weathereye.execute_playbooks as ex
 
 
 @click.group()
@@ -18,27 +18,36 @@ def install():
     pass
 
 
-# command to install surface
+# command to install surface cdms
 @install.command()
 def surface():
-    """Command to install SURFACE CDMS"""
-
-    # check if OS is supported before install
-    host_system = system().lower()
-    host_name = id()
-    host_version = version()
-
-    if host_system != 'linux':
-        
-        click.echo(f"{('macOS' if host_name == 'darwin' else host_name), host_version} is not currently supported for SURFACE CDMS")
-        click.echo(click.style("see docs.weathereye.org for supported operating systems", fg='red', bold=True))
-
+    # Confirm SURFACE CDMS install with user
+    if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies. Proceed?", fg='yellow', bold=True)):
         return
 
     # begin surface cdms installation
-    click.echo(click.style(f"{host_system, host_name, host_version} is compatible with surface CDMS", fg='blue', bold=True))
     click.echo("Installing SURFACE CDMS...")
 
+    # install SURFACE
+    if not ex.run_surface_playbook():
+        return
+
+
+# command to install surface on a romote machine
+@install.command()
+@click.option('--hosts_list', prompt='Hosts list ABSOLUTE path', required=True, type=str, help='The absolute path to the list of hosts to install surface on.')
+def surface_remote(hosts_list):
+    # Confirm remote SURFACE CDMS install with user
+    if not click.confirm(click.style("This will install SURFACE CDMS and additional required dependencies on remote systems. Proceed?", fg='yellow', bold=True)):
+        return
+    
+    # begin surface cdms installation
+    click.echo("Installing SURFACE CDMS...")
+
+    # install SURFACE
+    if not ex.remote_run_surface_playbook(hosts_list):
+        return
+    
 
 if __name__ == "__main__":
     sys.exit(main())  # pragma: no cover

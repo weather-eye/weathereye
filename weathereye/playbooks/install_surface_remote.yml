@@ -98,45 +98,42 @@
         delay: 120
 
       - name: Start Without Data
-        community.docker.docker_container_exec:
-          container: surface-api
-          command: bash load_initial_data.sh
+        ansible.builtin.shell: docker compose exec api bash load_initial_data.sh
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
         when: with_data.user_input in ['no', 'No', 'NO']
 
       - name: Start With Data
-        community.docker.docker_container_exec:
-          container: surface-database
-          command: sh -c 'psql -U dba -d surface_db < {{ data_path.user_input }}'
+        ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ data_path.user_input }}"
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
         when: with_data.user_input in ['yes', 'Yes', 'YES']
 
-      - name: Collect static files
-        community.docker.docker_container_exec:
-          container: surface-api
-          command: python manage.py collectstatic --noinput
+      - name: Collect Static Files
+        ansible.builtin.shell: docker compose exec api python manage.py collectstatic --noinput
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
 
       - name: Create admin username
         ansible.builtin.pause:
           prompt: Admin Username
-        register: django_username
+        register: admin
 
       - name: Create admin email address
         ansible.builtin.pause:
           prompt: Admin Email Address
-        register: django_email
+        register: admin_email
 
       - name: Create admin password
         ansible.builtin.pause:
           prompt: Admin password
           echo: no
-        register: django_password
+        register: admin_password
 
-      - name: Create admin user
-        community.docker.docker_container_exec:
-          container: surface-api
-          env: 
-            DJANGO_SUPERUSER_PASSWORD: "{{ django_password.user_input }}"
-          user: surface
-          command: python manage.py createsuperuser --username {{ django_username.user_input }} --email {{ django_email.user_input }} --noinput
+      - name: Create Admin User
+        ansible.builtin.shell: docker compose exec api sh -c "export DJANGO_SUPERUSER_USERNAME='{{ admin.user_input }}' && export DJANGO_SUPERUSER_EMAIL='{{ admin_email.user_input }}' && export DJANGO_SUPERUSER_PASSWORD='{{ admin_password.user_input }}' && python manage.py createsuperuser --noinput"
+        args:
+          chdir: "{{ surface_repo_path.user_input }}"
 
       - name: Stopping all containers
         community.docker.docker_compose_v2:

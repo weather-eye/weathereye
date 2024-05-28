@@ -56,9 +56,13 @@ Features
 
 Currently, the weathereye command line tool is limited to:
 
+* ``wx --help`` - List available available commands
+
+* ``wx venv`` - Ensure you run this command before installing anything with weathereye
+
 * ``wx install surface`` - Install SURFACE CDMS
 
-* ``wx install surface-remote`` - Install SURFACE CDMS on a remote machine
+* ``wx install surface --remote`` - Install SURFACE CDMS on a remote machine
 
 
 Usage
@@ -66,35 +70,12 @@ Usage
 
 1. **Before running any commands, activate the weathereye virtual environment created by pipx:**
 
-* Find the virtual environment path: 
-   Run ``pipx list`` which will show a path like ``path/to/venvs/weathereye``.
-
 * Activate the environment: 
-   ``source path/to/venvs/weathereye/bin/activate``
-
-* Deactivate the environment: 
-   ``deactivate``
+   ``wx venv``
 
 2. **Enable SSH connections for remote machines:**
 
-* To download SURFACE on remote machines, make sure the remote machines can be accessed via SSH.
-
-3. **When installing SURFACE on remote machines you will be prompted to provide a hosts list:**
-
-* Create a host list file:
-    * Create a YAML file (``.yml`` extension) containing the hostnames or IP addresses of the remote machines.
-
-* Populate host list file:
-    * Each hostname or IP address should be on a separate line.
-
-    * Example Host List (``hosts.yml``):
-
-        .. code-block::
-        
-            username@xxx.xx.xxx.xxx
-            xxx.xx.xxx.xxx
-
-* Enter the absolute path to the file you created (e.g., ``/path/to/hosts.yml``)
+* To download SURFACE on remote machines, ensure that the remote machines can be accessed via SSH.
 
 ..
     Credits

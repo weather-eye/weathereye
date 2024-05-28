@@ -35,7 +35,7 @@ def configure_surface(request):
             if remote_index is not None:
                 # Keep everything before the [remote] section and add the new content
                 new_lines = lines[:remote_index + 1]
-                new_lines.append(f'\n{form.cleaned_data['host'].strip()}')
+                new_lines.append(f'\n{form.cleaned_data["host"].strip()}')
 
                 # Write the modified contents back to the file
                 with open(remote_hosts_file, 'w') as file:

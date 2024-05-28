@@ -1,0 +1,32 @@
+---
+- name: Configure SURFACE
+  hosts: local
+  become: true # granting root privileges
+
+  tasks:
+    - name: Shut down stale configuration site
+      ansible.builtin.uri:
+        url: http://0.0.0.0:52376/shutdown/
+        method: GET
+        force: true
+        status_code: 200
+      ignore_errors: true
+        
+    - name: Start configuration site
+      ansible.builtin.shell: python3 manage.py runserver 0.0.0.0:52376
+      args:
+        chdir: "{{ django_webapp_path }}"
+      async: 7200
+      poll: 0
+
+    - name: Wait for the server to start
+      ansible.builtin.pause:
+        seconds: 7
+
+    - name: Reload configuration site
+      ansible.builtin.uri:
+        url: http://0.0.0.0:52376/
+        method: GET
+        force: true
+        status_code: 200
+      ignore_errors: true

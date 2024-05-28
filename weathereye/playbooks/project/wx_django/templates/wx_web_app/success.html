@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <link rel="icon" type="image/png" href="{% static 'images/circle_logo_small.png' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+  <title>Configuration Successful</title>
+</head>
+<body>
+  <div class="logo"></div>
+
+  <section>
+    <h1 class="success-h1">Configuration Successful!</h1>
+    <p class="success-p">Your SURFACE environment variables have been saved.</p>
+
+    <div class="btn-center">
+      <!-- Retry Configuration Button -->
+      <a href="/" class="button button-blue">Retry Configuration</a>
+
+      <!-- Continue Installation Button -->
+      <a href="{% url 'shutdown' %}" class="button button-green" onclick="window.close()">Continue Installation</a>
+    </div>
+  </section>
+</body>
+</html>

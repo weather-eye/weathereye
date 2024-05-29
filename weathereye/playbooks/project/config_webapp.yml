@@ -12,7 +12,7 @@
     - name: System check
       ansible.builtin.fail:
         msg: This host system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
-      when: ansible_distribution not in ['Darwin', 'Ubuntu']
+      when: ansible_distribution not in ['MacOSX', 'Ubuntu']
 
 
 - name: Configure SURFACE
@@ -27,19 +27,9 @@
         force: true
         status_code: 200
       ignore_errors: true
-      
-    - name: Check if Django is installed
-      ansible.builtin.shell: "pip show django | grep Version | awk '{print $2}'"
-      register: django_version
-      ignore_errors: true
 
-    - name: Install Django 4.1 if not installed
-      ansible.builtin.shell: pip install django==4.1
-      when: django_version.rc != 0
-
-    - name: Install or upgrade Django to 4.1 if version is less than 4.1
-      ansible.builtin.shell: pip install --upgrade 'django>=4.1,<4.2'
-      when: django_version.stdout is version('4.1', '<')
+    - name: Install required packages
+      ansible.builtin.shell: pip install --upgrade django==4.1
         
     - name: Start configuration site
       ansible.builtin.shell: python3 manage.py runserver 0.0.0.0:52376
@@ -66,5 +56,5 @@
 
     - name: Open SURFACE configuration in default web browser on macOS
       ansible.builtin.shell: open http://0.0.0.0:52376/
-      when: ansible_distribution in ['Darwin']
+      when: ansible_distribution in ['MacOSX']
       ignore_errors: true

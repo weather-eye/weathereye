@@ -65,20 +65,21 @@ def configure_surface(request):
             with open(variable_file, 'w') as vf:
                 vf.write('---\n')
                 # write surface_repo_path
-                if form.cleaned_data['surface_repo_path'][-1] == "/":
-                    vf.write(f'"surface_repo_path": "{form.cleaned_data['surface_repo_path'].strip()}surface/"\n')
+                surface_repo_path = form.cleaned_data['surface_repo_path'].strip()
+                if surface_repo_path[-1] == "/":
+                    vf.write(f'"surface_repo_path": "{surface_repo_path}surface/"\n')
                 else:
-                    vf.write(f'"surface_repo_path": "{form.cleaned_data['surface_repo_path'].strip()}/surface/"\n')
+                    vf.write(f'"surface_repo_path": "{surface_repo_path}/surface/"\n')
                 # write with_data
-                vf.write(f'"with_data": "{form.cleaned_data['with_data']}"\n')
+                vf.write(f'"with_data": "{form.cleaned_data["with_data"]}"\n')
                 # write with_data
-                vf.write(f'"data_path": "{form.cleaned_data['data_path']}"\n')
+                vf.write(f'"data_path": "{form.cleaned_data["data_path"]}"\n')
                 # write admin
-                vf.write(f'"admin": "{form.cleaned_data['admin'].strip()}"\n')
+                vf.write(f'"admin": "{form.cleaned_data["admin"].strip()}"\n')
                 # write admin_email
-                vf.write(f'"admin_email": "{form.cleaned_data['admin_email'].strip()}"\n')
+                vf.write(f'"admin_email": "{form.cleaned_data["admin_email"].strip()}"\n')
                 # write admin_password
-                vf.write(f'"admin_password": "{form.cleaned_data['admin_password']}"\n')
+                vf.write(f'"admin_password": "{form.cleaned_data["admin_password"]}"\n')
                 # path to production.env file
                 vf.write(f'"prod_env_path": "{prod_env_path}"\n')
 
@@ -113,3 +114,4 @@ def shutdown(request):
     # Send termination signal to the current process
     os.kill(os.getpid(), signal.SIGINT)
     return HttpResponse("Return to the Terminal to continue SURFACE installation...")
+

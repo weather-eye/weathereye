@@ -8,6 +8,8 @@ import ansible_runner
 playbooks_path = os.path.join(os.path.dirname(__file__), 'playbooks')
 # path to SURFACE configuration webapp project folder
 webapp_project_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'project', 'wx_django',)
+# code to activate weathereye venv
+activate_venv = "source " + os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'bin', 'activate')
 
 
 # retrieve and set SURFACE environment variables
@@ -15,6 +17,7 @@ def configure_surface(ansible_extravars):
     # configure web app playbook to django webapp folder path
     with open(ansible_extravars, 'a') as extravars_file:
             extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
+            extravars_file.write(f'\nactivate_venv: {activate_venv}')
 
     try:
         # start web app to configure SURFACE environment variables
@@ -49,6 +52,7 @@ def install_surface():
 
         if playbook_result.status == "successful":
             click.echo(click.style("\nSURFACE successfully installed locally!", fg='green', bold=True))
+            click.echo(click.style("\nYou can access surface at http://0.0.0.0:8080", fg='green', bold=True))
         else:
             click.echo(click.style("\nAn error occured during SURFACE installation.", fg='red'))
             click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
@@ -75,6 +79,7 @@ def remote_install_surface():
 
         if playbook_result.status == "successful":
             click.echo(click.style("\nSURFACE successfully installed!", fg='green', bold=True))
+            click.echo(click.style("\nYou can access surface at http://0.0.0.0:8080 on the remote machine", fg='green', bold=True))
         else:
             click.echo(click.style("\nAn error occured during SURFACE installation.", fg='red'))
             click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))

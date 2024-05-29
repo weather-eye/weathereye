@@ -140,3 +140,4 @@
       - name: SURFACE installation complete!
         ansible.builtin.shell: xdg-open http://0.0.0.0:8080
         when: ansible_facts['os_family'] == 'Linux'
+        ignore_errors: true

@@ -1,4 +1,20 @@
 ---
+- name: Check Supported Systems
+  hosts: local
+  gather_facts: true
+  become: true # granting root privileges
+
+  tasks:
+    - name: System
+      ansible.builtin.debug:
+        msg: The distribution is "{{ ansible_facts['distribution'] }}" and the version is "{{ ansible_facts['distribution_version'] }}"
+        
+    - name: System check
+      ansible.builtin.fail:
+        msg: This host system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+      when: ansible_distribution not in ['Darwin', 'Ubuntu']
+
+
 - name: Configure SURFACE
   hosts: local
   become: true # granting root privileges
@@ -11,12 +27,25 @@
         force: true
         status_code: 200
       ignore_errors: true
+      
+    - name: Check if Django is installed
+      ansible.builtin.shell: "pip show django | grep Version | awk '{print $2}'"
+      register: django_version
+      ignore_errors: true
+
+    - name: Install Django 4.1 if not installed
+      ansible.builtin.shell: pip install django==4.1
+      when: django_version.rc != 0
+
+    - name: Install or upgrade Django to 4.1 if version is less than 4.1
+      ansible.builtin.shell: pip install --upgrade 'django>=4.1,<4.2'
+      when: django_version.stdout is version('4.1', '<')
         
     - name: Start configuration site
       ansible.builtin.shell: python3 manage.py runserver 0.0.0.0:52376
       args:
         chdir: "{{ django_webapp_path }}"
-      async: 7200
+      async: 10800
       poll: 0
 
     - name: Wait for the server to start
@@ -29,4 +58,13 @@
         method: GET
         force: true
         status_code: 200
+        
+    - name: Open SURFACE configuration in default web browser on Linux
+      ansible.builtin.shell: xdg-open http://0.0.0.0:52376/
+      when: ansible_distribution in ['Ubuntu']
+      ignore_errors: true
+
+    - name: Open SURFACE configuration in default web browser on macOS
+      ansible.builtin.shell: open http://0.0.0.0:52376/
+      when: ansible_distribution in ['Darwin']
       ignore_errors: true

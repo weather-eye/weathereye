@@ -68,9 +68,9 @@ def surface(remote, sudo_password):
     if not ex.configure_surface(ansible_extravars):
         return
     
+    # click.launch("http://0.0.0.0:52376")
     click.echo(click.style("\nConfigure SURFACE at http://0.0.0.0:52376", fg='green'))
-    click.launch("http://0.0.0.0:52376")
-    click.confirm(click.style("SURFACE environment variables configuration complete?", fg='yellow'), abort=True)
+    click.confirm(click.style("\nSURFACE environment variables configuration complete?", fg='yellow'), abort=True)
 
     # start SURFACE install
     click.echo("\nInstalling SURFACE CDMS...")

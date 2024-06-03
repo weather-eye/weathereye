@@ -1,0 +1,60 @@
+---
+- name: Check Supported Systems
+  hosts: local
+  gather_facts: true
+  become: true # granting root privileges
+
+  tasks:
+    - name: System
+      ansible.builtin.debug:
+        msg: The distribution is "{{ ansible_facts['distribution'] }}" and the version is "{{ ansible_facts['distribution_version'] }}"
+        
+    - name: System check
+      ansible.builtin.fail:
+        msg: This host system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+      when: ansible_distribution not in ['MacOSX', 'Ubuntu']
+
+
+- name: Configure SURFACE
+  hosts: local
+  become: true # granting root privileges
+
+  tasks:
+    - name: Shut down stale configuration site
+      ansible.builtin.uri:
+        url: http://0.0.0.0:52376/shutdown/
+        method: GET
+        force: true
+        status_code: 200
+      ignore_errors: true
+
+    - name: Install required packages
+      ansible.builtin.shell: pip install --upgrade django==4.1
+        
+    - name: Start configuration site
+      ansible.builtin.shell: python3 manage.py runserver 0.0.0.0:52376
+      args:
+        chdir: "{{ django_webapp_path }}"
+      async: 10800
+      poll: 0
+
+    - name: Wait for the server to start
+      ansible.builtin.pause:
+        seconds: 7
+
+    - name: Reload configuration site
+      ansible.builtin.uri:
+        url: http://0.0.0.0:52376/
+        method: GET
+        force: true
+        status_code: 200
+        
+    - name: Open SURFACE configuration in default web browser on Linux
+      ansible.builtin.shell: xdg-open http://0.0.0.0:52376/
+      when: ansible_distribution in ['Ubuntu']
+      ignore_errors: true
+
+    - name: Open SURFACE configuration in default web browser on macOS
+      ansible.builtin.shell: open http://0.0.0.0:52376/
+      when: ansible_distribution in ['MacOSX']
+      ignore_errors: true

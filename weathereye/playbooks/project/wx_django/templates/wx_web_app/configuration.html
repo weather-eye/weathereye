@@ -47,11 +47,15 @@
         <ul>
           <li>
               <span class="label">Remote Host for SURFACE Install:</span>
-              <div>Enter the hostname or IP address of the remote machine where you want to install SURFACE. If you're installing on localhost, you can leave this field blank.</div>
+              <div>Enter the hostname or IP address of the remote machine where you want to install SURFACE. If you are installing on localhost, you can leave this field blank.</div>
           </li>
           <li>
               <span class="label">Path on Remote Machine to Clone SURFACE Repository:</span>
-              <div>If you're installing on a remote machine, specify the path where you want to clone the SURFACE repository. If you're installing locally, specify the local path.</div>
+              <div>If you are installing on a remote machine, specify the path where you want to clone the SURFACE repository. If you are installing locally, specify the local path.</div>
+          </li>
+          <li>
+            <span class="label">Remote connection password and Remote root password:</span>
+            <div>If you are installing on a remote machine, specify the remote connection password and the root password on the remote machine. If you are install locally you can ignore this.</div>
           </li>
           <li>
               <span class="label">Start with Backup Data:</span>
@@ -92,6 +96,14 @@
 
           <label for="{{ form.surface_repo_path.id_for_label }}"><span class="required"></span>{{ form.surface_repo_path.label }}</label>
           {{ form.surface_repo_path }}
+
+          {% if form.remote_connect_password %}
+            <label for="{{ form.remote_connect_password.id_for_label }}"><span class="required"></span>{{ form.remote_connect_password.label }}</label>
+            {{ form.remote_connect_password }}
+
+            <label for="{{ form.remote_root_password.id_for_label }}"><span class="required"></span>{{ form.remote_root_password.label }}</label>
+            {{ form.remote_root_password }}
+          {% endif %}
 
           <label>{{ form.with_data.label }}</label>
           {{ form.with_data }}

@@ -18,6 +18,16 @@ class SurfaceConfigurationForm(forms.Form):
             required=True, 
             widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. /remote/machine/path/to/desktop/',})
         )
+        remote_connect_password = forms.CharField(
+            label="Password to connect to the remote machine:", 
+            required=True, 
+            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. remotepassword',})
+        )
+        remote_root_password = forms.CharField(
+            label="Root password on the remote machine:", 
+            required=True, 
+            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. rootpassword',})
+        )
     else:
         host = forms.CharField(
             label="Host for SURFACE install:", 

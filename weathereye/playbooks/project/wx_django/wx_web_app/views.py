@@ -10,6 +10,17 @@ def configure_surface(request):
         form = SurfaceConfigurationForm(request.POST)
         if form.is_valid():
             # Process the form data
+            # open install type file to determine which form items the user should see
+            install_type_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'install_type')
+            with open(install_type_path, 'r') as file:
+                install_type = file.readline().strip()
+
+            # path to remote connection file
+            remote_connection_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'connection_password')
+
+            # path to root user password file
+            sudo_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'become_password')
+
             # path to surface variables file
             variable_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'extravars',)
 
@@ -60,6 +71,14 @@ def configure_surface(request):
                 # Write the modified contents back to the file
                 with open(prod_env_path, 'w') as file:
                     file.writelines(prod_new_lines)
+
+            # write out remote host connection details 
+            if install_type == "remote":
+                with open(remote_connection_password_file_path, 'w') as remote_connection_password_file:
+                    remote_connection_password_file.write(form.cleaned_data["remote_connect_password"])
+                
+                with open(sudo_password_file_path, 'w') as sudo_password_file:
+                    sudo_password_file.write(form.cleaned_data["remote_root_password"])
 
             # write out surface variables
             with open(variable_file, 'w') as vf:

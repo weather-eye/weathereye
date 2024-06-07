@@ -40,7 +40,7 @@ def surface(remote, sudo_password):
     sudo_password_file_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'become_password')
 
     # path to remote machine connection password
-    remote_connection_password_file_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'connection_password')
+    #remote_connection_password_file_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'connection_password')
 
     # path to ansible extarvars
     ansible_extravars = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'extravars',)
@@ -77,6 +77,7 @@ def surface(remote, sudo_password):
 
     # install SURFACE on a remote machine
     if remote:
+        '''
         click.echo(click.style("\n\n\n[Remote host authentication details]", fg='blue', bold=True))
 
         # remote host connection password
@@ -90,6 +91,7 @@ def surface(remote, sudo_password):
         # write remote connection sudo password to file
         with open(sudo_password_file_path, 'w') as sudo_password_file:
             sudo_password_file.write(remote_sudo_password)
+        '''
 
         if not ex.remote_install_surface():
             return

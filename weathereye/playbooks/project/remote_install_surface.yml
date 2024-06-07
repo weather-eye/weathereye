@@ -12,6 +12,7 @@
           status_code: 200
         ignore_errors: true 
 
+
 - name: Install SURFACE
   hosts: remote
   become: true # granting root privileges
@@ -116,11 +117,23 @@
           chdir: "{{ surface_repo_path }}"
         when: with_data in ['no', 'No', 'NO']
 
+      - name: Copy Data file to remote machine
+        ansible.builtin.copy:
+          src: "{{ data_path }}"
+          dest: "{{ surface_repo_path }}"
+        when: with_data in ['yes', 'Yes', 'YES']
+        become: false
+
       - name: Start With Data (This may take a while...)
-        ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ data_path }}"
+        ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ surface_repo_path  }}/{{ data_file_name }}"
         args:
           chdir: "{{ surface_repo_path }}"
         when: with_data in ['yes', 'Yes', 'YES']
+
+      - name: Remove data file
+        ansible.builtin.file:
+          path: "{{ surface_repo_path  }}/{{ data_file_name }}"
+          state: absent
 
       - name: Collect Static Files
         ansible.builtin.shell: docker compose exec api python manage.py collectstatic --noinput

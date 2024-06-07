@@ -15,7 +15,7 @@ def main(args=None):
 # WeatherEye venv
 @main.command()
 def venv():
-    """WeatherEye venv command (Run this command before installing anything with weathereye)"""
+    """WeatherEye venv command, run this command before installing anything with weathereye."""
     # path to pipx weathereye virtual environment
     venv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'bin', 'activate')
     

@@ -72,8 +72,10 @@ def configure_surface(request):
                     vf.write(f'"surface_repo_path": "{surface_repo_path}/surface/"\n')
                 # write with_data
                 vf.write(f'"with_data": "{form.cleaned_data["with_data"]}"\n')
-                # write with_data
+                # write data file path
                 vf.write(f'"data_path": "{form.cleaned_data["data_path"]}"\n')
+                # write data filename
+                vf.write(f'"data_file_name": "{form.cleaned_data["data_path"].strip("/").split("/")[-1]}"\n')
                 # write admin
                 vf.write(f'"admin": "{form.cleaned_data["admin"].strip()}"\n')
                 # write admin_email

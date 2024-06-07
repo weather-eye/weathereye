@@ -39,7 +39,7 @@ class SurfaceConfigurationForm(forms.Form):
         widget=forms.RadioSelect(attrs={'class': 'form-check-input',})
     )
     data_path = forms.CharField(
-        label="Backup data file path:", 
+        label="Backup data file path on host machine:", 
         required=False, 
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. /path/to/backup/file',})
     )

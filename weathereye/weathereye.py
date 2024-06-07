@@ -17,7 +17,6 @@ def configure_surface(ansible_extravars):
     # configure web app playbook to django webapp folder path
     with open(ansible_extravars, 'a') as extravars_file:
             extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
-            extravars_file.write(f'\nactivate_venv: {activate_venv}')
 
     try:
         # start web app to configure SURFACE environment variables

@@ -1,54 +1,19 @@
 ---
-- name: Shut down configuration site
-  hosts: local
-  become: false # granting root privileges
-
-  tasks: 
-      - name: Shut down
-        ansible.builtin.uri:
-          url: http://0.0.0.0:52376/shutdown/
-          method: GET
-          force: true
-          status_code: 200
-        ignore_errors: true 
-
-
 - name: Install SURFACE
   hosts: remote
   become: true # granting root privileges
 
   tasks: 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "p"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Check Supported Systems
         ansible.builtin.fail:
           msg: The remote machine's system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
         when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
      
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Update apt cache
         apt:
           update_cache: true
         retries: 2
         delay: 60 # Wait 1 minute between retires
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: Install required system packages
         apt:
@@ -63,83 +28,34 @@
             - python3-setuptools
           state: latest
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Remove docker-ce
         apt:
           name: docker-ce
           state: absent
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: Add Docker GPG apt Key
         apt_key:
           url: https://download.docker.com/linux/ubuntu/gpg
           state: present
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Add Docker Repository
         apt_repository:
           repo: deb https://download.docker.com/linux/ubuntu jammy stable
           state: present
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: Install docker-ce
         apt:
           name: docker-ce
           state: latest
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Install Docker Module for Python
         pip:
           name: docker
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: Remove old SUFACE directory clones
         ansible.builtin.file:
           path: "{{ surface_repo_path }}"
           state: absent
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: Clone SURFACE Repository
         ansible.builtin.git:
@@ -148,36 +64,15 @@
           force: true
         become: false
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Remove example SUFACE config file (production.env.example)
         ansible.builtin.file:
           path: "{{ surface_repo_path }}api/production.env.example"
           state: absent
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Add SURFACE config file (production.env)
         ansible.builtin.copy:
           src: "{{ prod_env_path }}"
           dest: "{{ surface_repo_path }}api/"
-        become: false
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppppppp"
-          dest: "{{ progress_file }}"
         become: false
 
       - name: Creating and starting Docker services (This may take a while...)
@@ -191,13 +86,6 @@
             - cache
             - redis
             - api
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       # - name: Build docker images (This may take a while...)
       #   ansible.builtin.shell: docker compose build
@@ -222,29 +110,15 @@
         when: with_data in ['yes', 'Yes', 'YES']
         become: false
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Start With Data (This may take a while...)
-        ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ surface_repo_path }}/{{ data_file_name }}"
+        ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ surface_repo_path  }}/{{ data_file_name }}"
         args:
           chdir: "{{ surface_repo_path }}"
         when: with_data in ['yes', 'Yes', 'YES']
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Remove data file
         ansible.builtin.file:
-          path: "{{ surface_repo_path }}/{{ data_file_name }}"
+          path: "{{ surface_repo_path  }}/{{ data_file_name }}"
           state: absent
 
       - name: Collect Static Files
@@ -252,48 +126,20 @@
         args:
           chdir: "{{ surface_repo_path }}"
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Create Admin User
         ansible.builtin.shell: docker compose exec api sh -c "export DJANGO_SUPERUSER_USERNAME='{{ admin }}' && export DJANGO_SUPERUSER_EMAIL='{{ admin_email }}' && export DJANGO_SUPERUSER_PASSWORD='{{ admin_password }}' && python manage.py createsuperuser --noinput"
         args:
           chdir: "{{ surface_repo_path }}"
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "pppppppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: Stopping all containers
         community.docker.docker_compose_v2:
           project_src: "{{ surface_repo_path }}"
           state: stopped
 
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
-
       - name: Starting up SURFACE
         community.docker.docker_compose_v2:
           project_src: "{{ surface_repo_path }}"
           state: present
-
-      - name: progress
-        local_action:
-          module: ansible.builtin.copy
-          content: "ppppppppppppppppppppp"
-          dest: "{{ progress_file }}"
-        become: false
 
       - name: SURFACE installation complete!
         ansible.builtin.shell: xdg-open http://0.0.0.0:8080

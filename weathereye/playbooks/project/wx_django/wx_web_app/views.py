@@ -27,9 +27,6 @@ def configure_surface(request):
 
             # path to production.env file
             prod_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'production.env',)
-
-            # path to the progress file
-            progress_file_path = os.path.join(settings.STATIC_DIR, 'misc', 'progress')
             
             # write out remote host
             # path to remote hosts path
@@ -107,8 +104,6 @@ def configure_surface(request):
                 vf.write(f'"admin_password": "{form.cleaned_data["admin_password"]}"\n')
                 # path to production.env file
                 vf.write(f'"prod_env_path": "{prod_env_path}"\n')
-                # path to the progress file
-                vf.write(f'"progress_file": "{progress_file_path}"\n')
 
             # Write out production.env variables
             with open(prod_env_path, 'a') as prod:
@@ -157,3 +152,7 @@ def get_install_progress(request):
     except Exception as e:
         return HttpResponse(str(e), status=500)
 
+def simulate_progress(request):
+    with open(os.path.join(settings.STATIC_DIR, 'misc', 'progress'), 'a') as file:
+        file.write('p')
+    return HttpResponse('File updated successfully')

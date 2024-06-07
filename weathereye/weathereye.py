@@ -26,7 +26,9 @@ def configure_surface(ansible_extravars):
                                              playbook='config_webapp.yml',)
 
         if playbook_result.status == "successful":
-            pass
+            # update the progress file with a success code
+            with open(progress_file_path, 'a') as pf:
+                pf.write('s')
         else:
             # update the progress file with a fail code
             with open(progress_file_path, 'a') as pf:
@@ -59,6 +61,10 @@ def install_surface():
                                              playbook='install_surface.yml',)
 
         if playbook_result.status == "successful":
+            # update the progress file with a success code
+            with open(progress_file_path, 'a') as pf:
+                pf.write('s')
+
             click.echo(click.style("\nSURFACE successfully installed locally!", fg='green', bold=True))
             click.echo(click.style("\nYou can access surface at http://0.0.0.0:8080", fg='green', bold=True))
         else:
@@ -93,6 +99,10 @@ def remote_install_surface():
                                              playbook='remote_install_surface.yml',)
 
         if playbook_result.status == "successful":
+            # update the progress file with a success code
+            with open(progress_file_path, 'a') as pf:
+                pf.write('s')
+
             click.echo(click.style("\nSURFACE successfully installed!", fg='green', bold=True))
             click.echo(click.style("\nYou can access surface at http://0.0.0.0:8080 on the remote machine", fg='green', bold=True))
         else:

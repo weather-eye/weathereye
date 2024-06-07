@@ -20,7 +20,7 @@
 
     <h3>Surface Installation in Progress</h3>
     <div id="progress-container">
-        <div id="progress-bar">0%</div>
+        <div id="progress-bar"><span style="padding-left: 5px; padding-right: 5px;">0%</span></div>
     </div>
     <div id="status">Loading...</div>
 
@@ -30,6 +30,16 @@
     </div>
   </section>
   <script>
+    // Function to click the shutdown button after 5 hours if the site is still running
+    function clickButton() {
+      document.getElementById('shutdownButton').click();
+    }
+
+    const fiveHoursInMilliseconds = 5 * 60 * 60 * 1000;
+
+    setTimeout(clickButton, fiveHoursInMilliseconds);
+
+    // progress bar control
     async function fetchFileContent() {
         try {
             const response = await fetch('/install-progress/');
@@ -52,7 +62,12 @@
             progressBar.style.backgroundColor = 'red';
             progressBar.textContent = 'Install Failed';
             status.textContent = 'Install Failed';
-        } else {
+        } else if (text.includes('s')) {
+            progressBar.style.width = '100%';
+            progressBar.style.backgroundColor = '#4caf50';
+            progressBar.textContent = '100%';
+            status.textContent = 'Loading Complete';
+        }else {
             progressBar.style.backgroundColor = '#4caf50'
             progressBar.style.width = Math.floor(percentage) + '%';
             progressBar.textContent = Math.floor(percentage) + '%';
@@ -71,18 +86,29 @@
 
     setInterval(checkFile, 10000); // Check every minute (10 seconds)
 
-    // Initial check
-    checkFile();
+    checkFile(); // initial check
 
-    // Function to click the button
-    function clickButton() {
-      document.getElementById('shutdownButton').click();
+    // Function to write 'p' to file
+    function writeToFile() {
+      fetch('/installation-progress/')  // Call the endpoint to trigger the file writing
+        .catch(error => console.error('Error:', error));
     }
 
-    // Set timeout to 5 hours (5 * 60 * 60 * 1000 milliseconds)
-    const fiveHoursInMilliseconds = 5 * 60 * 60 * 1000;
+    // Schedule writing 'p' to file every 2.647 minutes
+    function scheduleWrite() {
+        let counter = 0;
+        const interval = 2.647 * 60 * 1000; // Convert minutes to milliseconds
+        const writeInterval = setInterval(() => {
+            writeToFile();
+            counter++;
+            if (counter === 17) {
+                clearInterval(writeInterval);
+            }
+        }, interval);
+    }
 
-    setTimeout(clickButton, fiveHoursInMilliseconds);
+    scheduleWrite(); // Start the process
+
   </script>
 </body>
 </html>

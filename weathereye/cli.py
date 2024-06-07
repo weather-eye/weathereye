@@ -2,6 +2,7 @@
 import os
 import sys
 import click
+import time
 
 import weathereye.weathereye as ex
 
@@ -48,9 +49,24 @@ def surface(remote, sudo_password):
     # path to SURFACE installation type
     install_type = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'install_type',)
 
+    # path to SURFACE config status
+    config_status_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'config_status',)
+    config_status = "incomplete"
+
+    # progress file path
+    progress_file_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'project', 'wx_django', 'static', 'misc', 'progress')
+
+    # clear progress file before install
+    with open(progress_file_path, 'w') as pf:
+        pf.write('')
+
     # clear variable file before install
     with open(ansible_extravars, 'w') as ef:
         ef.write('---')
+
+    # set config status to incomplete before install
+    with open(config_status_path, 'w') as cs:
+        cs.write(config_status)
 
     # write sudo password to file
     with open(sudo_password_file_path, 'w') as sudo_password_file:
@@ -68,9 +84,18 @@ def surface(remote, sudo_password):
     if not ex.configure_surface(ansible_extravars):
         return
     
-    # click.launch("http://0.0.0.0:52376")
-    click.echo(click.style("\nConfigure SURFACE at http://0.0.0.0:52376", fg='green'))
-    click.confirm(click.style("\nSURFACE environment variables configuration complete?", fg='yellow'), abort=True)
+    # click.launch("http://localhost:52376/")
+    click.echo(click.style("\nConfigure SURFACE at http://localhost:52376/", fg='green'))
+    # click.confirm(click.style("\nSURFACE environment variables configuration complete?", fg='yellow'), abort=True)
+    
+    # waiting for config status to return complete
+    while (config_status == "incomplete"):
+        with open(config_status_path, 'r') as rcs:
+            config_status = rcs.readline().strip()
+
+        # wait 60 seconds vefore 
+        time.sleep(60)
+
 
     # start SURFACE install
     click.echo("\nInstalling SURFACE CDMS...")

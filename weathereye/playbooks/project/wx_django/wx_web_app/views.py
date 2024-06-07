@@ -3,6 +3,7 @@ import signal
 
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.conf import settings
 from .forms import SurfaceConfigurationForm
 
 def configure_surface(request):
@@ -26,6 +27,9 @@ def configure_surface(request):
 
             # path to production.env file
             prod_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'production.env',)
+
+            # path to the progress file
+            progress_file_path = os.path.join(settings.STATIC_DIR, 'misc', 'progress')
             
             # write out remote host
             # path to remote hosts path
@@ -103,27 +107,34 @@ def configure_surface(request):
                 vf.write(f'"admin_password": "{form.cleaned_data["admin_password"]}"\n')
                 # path to production.env file
                 vf.write(f'"prod_env_path": "{prod_env_path}"\n')
+                # path to the progress file
+                vf.write(f'"progress_file": "{progress_file_path}"\n')
 
-                # Write out production.env variables
-                with open(prod_env_path, 'a') as prod:
-                    prod.write('\n\n')
-                    prod.write(f'LRGS_USER={form.cleaned_data["lrgs_user"].strip()}\n')
-                    prod.write(f'LRGS_PASSWORD={form.cleaned_data["lrgs_password"]}\n')
-                    
-                    prod.write('\n')
-                    prod.write(f'TIMEZONE_NAME={form.cleaned_data["timezone_name"].strip()}\n')
-                    prod.write(f'TIMEZONE_OFFSET={form.cleaned_data["timezone_offset"]}\n')
+            # Write out production.env variables
+            with open(prod_env_path, 'a') as prod:
+                prod.write('\n\n')
+                prod.write(f'LRGS_USER={form.cleaned_data["lrgs_user"].strip()}\n')
+                prod.write(f'LRGS_PASSWORD={form.cleaned_data["lrgs_password"]}\n')
+                
+                prod.write('\n')
+                prod.write(f'TIMEZONE_NAME={form.cleaned_data["timezone_name"].strip()}\n')
+                prod.write(f'TIMEZONE_OFFSET={form.cleaned_data["timezone_offset"]}\n')
 
-                    prod.write('\n')
-                    prod.write(f'MAP_LATITUDE={form.cleaned_data["map_latitude"]}\n')
-                    prod.write(f'MAP_LONGITUDE={form.cleaned_data["map_longitude"]}\n')
-                    prod.write(f'MAP_ZOOM={form.cleaned_data["map_zoom"]}\n')
+                prod.write('\n')
+                prod.write(f'MAP_LATITUDE={form.cleaned_data["map_latitude"]}\n')
+                prod.write(f'MAP_LONGITUDE={form.cleaned_data["map_longitude"]}\n')
+                prod.write(f'MAP_ZOOM={form.cleaned_data["map_zoom"]}\n')
 
-                    prod.write('\n')
-                    prod.write(f'SPATIAL_ANALYSIS_INITIAL_LATITUDE={form.cleaned_data["spatial_analysis_initial_latitude"]}\n')
-                    prod.write(f'SPATIAL_ANALYSIS_INITIAL_LONGITUDE={form.cleaned_data["spatial_analysis_initial_longitude"]}\n')
-                    prod.write(f'SPATIAL_ANALYSIS_FINAL_LATITUDE={form.cleaned_data["spatial_analysis_final_latitude"]}\n')
-                    prod.write(f'SPATIAL_ANALYSIS_FINAL_LONGITUDE={form.cleaned_data["spatial_analysis_final_longitude"]}\n')
+                prod.write('\n')
+                prod.write(f'SPATIAL_ANALYSIS_INITIAL_LATITUDE={form.cleaned_data["spatial_analysis_initial_latitude"]}\n')
+                prod.write(f'SPATIAL_ANALYSIS_INITIAL_LONGITUDE={form.cleaned_data["spatial_analysis_initial_longitude"]}\n')
+                prod.write(f'SPATIAL_ANALYSIS_FINAL_LATITUDE={form.cleaned_data["spatial_analysis_final_latitude"]}\n')
+                prod.write(f'SPATIAL_ANALYSIS_FINAL_LONGITUDE={form.cleaned_data["spatial_analysis_final_longitude"]}\n')
+
+            # open config_status file and update it to complete
+            config_status_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'config_status')
+            with open(config_status_path, 'w') as cs:
+                cs.write('complete')
 
             # redirect to success page
             return render(request, 'wx_web_app/success.html')  # Redirect to success page
@@ -135,4 +146,14 @@ def shutdown(request):
     # Send termination signal to the current process
     os.kill(os.getpid(), signal.SIGINT)
     return HttpResponse("Return to the Terminal to continue SURFACE installation...")
+
+def get_install_progress(request):
+    progress_file_path = os.path.join(settings.STATIC_DIR, 'misc', 'progress')
+
+    try:
+        with open(progress_file_path, 'r') as file:
+            content = file.read()
+        return HttpResponse(content, content_type='text/plain')
+    except Exception as e:
+        return HttpResponse(str(e), status=500)
 

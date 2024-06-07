@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.configure_surface, name='configure_surface'),
     path('shutdown/', views.shutdown, name='shutdown'),
+    path('install-progress/', views.get_install_progress, name='get_install_progress'),
 ]

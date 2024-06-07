@@ -22,7 +22,7 @@
   tasks:
     - name: Shut down stale configuration site
       ansible.builtin.uri:
-        url: http://0.0.0.0:52376/shutdown/
+        url: http://localhost:52376/shutdown/
         method: GET
         force: true
         status_code: 200
@@ -32,7 +32,7 @@
       ansible.builtin.shell: pip install --upgrade django==4.1
         
     - name: Start configuration site
-      ansible.builtin.shell: python3 manage.py runserver 0.0.0.0:52376
+      ansible.builtin.shell: python3 manage.py runserver localhost:52376
       args:
         chdir: "{{ django_webapp_path }}"
       async: 10800
@@ -44,17 +44,17 @@
 
     - name: Reload configuration site
       ansible.builtin.uri:
-        url: http://0.0.0.0:52376/
+        url: http://localhost:52376/
         method: GET
         force: true
         status_code: 200
         
     - name: Open SURFACE configuration in default web browser on Linux
-      ansible.builtin.shell: xdg-open http://0.0.0.0:52376/
+      ansible.builtin.shell: xdg-open http://localhost:52376/
       when: ansible_distribution in ['Ubuntu']
       ignore_errors: true
 
     - name: Open SURFACE configuration in default web browser on macOS
-      ansible.builtin.shell: open http://0.0.0.0:52376/
+      ansible.builtin.shell: open http://localhost:52376/
       when: ansible_distribution in ['MacOSX']
       ignore_errors: true

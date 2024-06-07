@@ -39,6 +39,14 @@ body {
     background-color: #198754;
   }
 
+  .button-red {
+    background-color: #dc3545;
+  }
+
+  .button-red:hover {
+    background-color: #bb2b3a;
+  }
+
   .success-h1 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
@@ -58,6 +66,11 @@ body {
     font-size: 2rem;
     margin-bottom: 1rem;
     margin-top: 0rem;
+  }
+
+  h3 {
+    text-align: center;
+    color: #666;
   }
   
   section {
@@ -253,4 +266,25 @@ body {
   ul li span.label {
       color: #5b5a5a;
       font-weight: bold;
+  }
+
+  /* Progress bar css */
+  #progress-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    margin: 20px 0;
+    border-radius: 20px;
+  }
+  #progress-bar {
+      width: 0;
+      height: 30px;
+      background-color: #4caf50;
+      text-align: center;
+      line-height: 30px;
+      color: white;
+      border-radius: 20px;
+  }
+  #status {
+      margin-top: 20px;
   }

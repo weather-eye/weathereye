@@ -26,9 +26,7 @@ def configure_surface(ansible_extravars):
                                              playbook='config_webapp.yml',)
 
         if playbook_result.status == "successful":
-            # update the progress file with a success code
-            with open(progress_file_path, 'a') as pf:
-                pf.write('s')
+            pass
         else:
             # update the progress file with a fail code
             with open(progress_file_path, 'a') as pf:

@@ -49,12 +49,12 @@
         force: true
         status_code: 200
         
-    - name: Open SURFACE configuration in default web browser on Linux
-      ansible.builtin.shell: xdg-open http://localhost:52376/
-      when: ansible_distribution in ['Ubuntu']
-      ignore_errors: true
+    # - name: Open SURFACE configuration in default web browser on Linux
+    #   ansible.builtin.shell: xdg-open http://localhost:52376/
+    #   when: ansible_distribution in ['Ubuntu']
+    #   ignore_errors: true
 
-    - name: Open SURFACE configuration in default web browser on macOS
-      ansible.builtin.shell: open http://localhost:52376/
-      when: ansible_distribution in ['MacOSX']
-      ignore_errors: true
+    # - name: Open SURFACE configuration in default web browser on macOS
+    #   ansible.builtin.shell: open http://localhost:52376/
+    #   when: ansible_distribution in ['MacOSX']
+    #   ignore_errors: true

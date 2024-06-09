@@ -15,31 +15,6 @@
       when: ansible_distribution not in ['MacOSX', 'Ubuntu']
 
 
-- name: Install Required Packages
-  hosts: local
-  become: true # granting root privileges
-
-  tasks: 
-      - name: Check Supported Systems
-        ansible.builtin.fail:
-          msg: The host system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
-        when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
-     
-      - name: Update apt cache
-        apt:
-          update_cache: true
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
-        when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "22.04"
-
-      - name: Install sshpass to faciliate ssh connection
-        apt:
-          pkg:
-            - python3-pip
-          state: latest
-        when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "22.04"
-
-
 - name: Configure SURFACE
   hosts: local
   become: true # granting root privileges

@@ -1,5 +1,28 @@
 ---
 - name: Install SURFACE
+  hosts: local
+  become: true # granting root privileges
+
+  tasks: 
+      - name: Check Supported Systems
+        ansible.builtin.fail:
+          msg: The remote machine's system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+        when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
+     
+      - name: Update apt cache
+        apt:
+          update_cache: true
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Install sshpass to faciliate ssh connection
+        apt:
+          pkg:
+            - sshpass
+          stale: latest
+
+
+- name: Install SURFACE
   hosts: remote
   become: true # granting root privileges
 

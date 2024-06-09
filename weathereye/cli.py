@@ -89,11 +89,14 @@ def surface(remote, sudo_password):
     # click.confirm(click.style("\nSURFACE environment variables configuration complete?", fg='yellow'), abort=True)
     
     # waiting for config status to return complete
-    while (config_status == "incomplete"):
+    while (True):
         with open(config_status_path, 'r') as rcs:
             config_status = rcs.readline().strip()
 
-        # wait 60 seconds vefore 
+        if config_status == "complete":
+            break
+
+        # wait 60 seconds before 
         time.sleep(60)
 
 

@@ -36,7 +36,7 @@
         apt:
           pkg:
             - python3-pip
-          stale: latest
+          state: latest
         when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_version'] == "22.04"
 
 

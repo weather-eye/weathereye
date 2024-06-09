@@ -19,7 +19,7 @@
         apt:
           pkg:
             - sshpass
-          stale: latest
+          state: latest
 
 
 - name: Install SURFACE

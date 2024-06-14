@@ -45,14 +45,14 @@ def surface(remote, sudo_password):
     if 'VIRTUAL_ENV' in os.environ:
         current_venv = os.path.basename(os.environ['VIRTUAL_ENV'])
         if current_venv == venv_name:
-            click.echo(f"Virtual environment '{venv_name}' is activated.", fg='green')
+            click.echo(click.style(f"Virtual environment '{venv_name}' is activated.", fg='green'))
         else:
-            click.echo(f"Warning: Virtual environment '{venv_name}' is not activated. Current active venv is '{current_venv}'.", fg='red')
+            click.echo(click.style(f"Warning: Virtual environment '{venv_name}' is not activated. Current active venv is '{current_venv}'.", fg='red'))
             click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
             click.echo(click.style(f"source {venv_path}", fg='yellow'))
             return False
     else:
-        click.echo(f"Warning: Virtual environment '{venv_name}' is not activated.", fg='red')
+        click.echo(click.style(f"Warning: Virtual environment '{venv_name}' is not activated.", fg='red'))
         click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
         click.echo(click.style(f"source {venv_path}", fg='yellow'))
         return False

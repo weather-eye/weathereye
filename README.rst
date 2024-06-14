@@ -31,6 +31,12 @@ Linux
 Install
 -------
 
+Ensure that pip is installed.
+
+.. code-block::
+
+    sudo apt install pip
+
 To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
 
 .. code-block::

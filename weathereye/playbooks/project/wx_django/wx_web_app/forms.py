@@ -11,34 +11,28 @@ class SurfaceConfigurationForm(forms.Form):
         host = forms.CharField(
             label="Remote Host for SURFACE install:", 
             required=True, 
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. username@xxx.xxx.xx.xxx',})
+            widget=forms.TextInput(attrs={'class': 'form-control',})
         )
         surface_repo_path = forms.CharField(
             label="Path on remote machine to clone SURFACE repository:", 
             required=True, 
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. /remote/machine/path/to/desktop/',})
+            widget=forms.TextInput(attrs={'class': 'form-control',})
         )
         remote_connect_password = forms.CharField(
             label="Password to connect to the remote machine:", 
             required=True, 
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. remotepassword',})
+            widget=forms.PasswordInput(attrs={'class': 'form-control',})
         )
         remote_root_password = forms.CharField(
             label="Root password on the remote machine:", 
             required=True, 
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. rootpassword',})
+            widget=forms.PasswordInput(attrs={'class': 'form-control',})
         )
     else:
-        host = forms.CharField(
-            label="Host for SURFACE install:", 
-            required=False, 
-            initial="localhost",
-            widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'localhost'})
-        )
         surface_repo_path = forms.CharField(
             label="Path to clone SURFACE repository:", 
             required=True, 
-            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. /path/to/desktop/',})
+            widget=forms.TextInput(attrs={'class': 'form-control',})
         )
 
     with_data = forms.ChoiceField(
@@ -51,17 +45,17 @@ class SurfaceConfigurationForm(forms.Form):
     data_path = forms.CharField(
         label="Backup data file path on host machine:", 
         required=False, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. /path/to/backup/file',})
+        widget=forms.TextInput(attrs={'class': 'form-control',})
     )
     admin = forms.CharField(
         label="Admin Username:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. admin',})
+        widget=forms.TextInput(attrs={'class': 'form-control',})
     )
     admin_email = forms.CharField(
         label="Admin Email:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. admin@example.com',})
+        widget=forms.TextInput(attrs={'class': 'form-control',})
     )
     admin_password = forms.CharField(
         label="Admin Password:", 
@@ -73,7 +67,7 @@ class SurfaceConfigurationForm(forms.Form):
     lrgs_user = forms.CharField(
         label="LRGS User:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. lrgs_user',})
+        widget=forms.TextInput(attrs={'class': 'form-control',})
     )
     lrgs_password = forms.CharField(
         label="LRGS Password:", 
@@ -83,45 +77,45 @@ class SurfaceConfigurationForm(forms.Form):
     timezone_name = forms.CharField(
         label="Timezone Name:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. America/New_York',})
+        widget=forms.TextInput(attrs={'class': 'form-control',})
     )
     timezone_offset = forms.CharField(
         label="Timezone Offset:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. -0500',})
+        widget=forms.TextInput(attrs={'class': 'form-control',})
     )
     map_latitude = forms.CharField(
         label="Map Latitude:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. 40.7128'})
+        widget=forms.TextInput(attrs={'class': 'form-control disabled-field',})
     )
     map_longitude = forms.CharField(
         label="Map Longitude:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. -74.0060'})
+        widget=forms.TextInput(attrs={'class': 'form-control disabled-field',})
     )
     map_zoom = forms.IntegerField(
         label="Map Zoom Level:", 
         required=True, 
-        widget=forms.NumberInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. 10',})
+        widget=forms.NumberInput(attrs={'id':'zoomField','class': 'form-control',})
     )
     spatial_analysis_initial_latitude = forms.CharField(
         label="Spatial Analysis Initial Latitude:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. 40.7128',})
+        widget=forms.TextInput(attrs={'class': 'form-control disabled-field',})
     )
     spatial_analysis_initial_longitude = forms.CharField(
         label="Spatial Analysis Initial Longitude:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. -74.0060',})
+        widget=forms.TextInput(attrs={'class': 'form-control disabled-field',})
     )
     spatial_analysis_final_latitude = forms.CharField(
         label="Spatial Analysis Final Latitude:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. 40.7128',})
+        widget=forms.TextInput(attrs={'class': 'form-control disabled-field',})
     )
     spatial_analysis_final_longitude = forms.CharField(
         label="Spatial Analysis Final Longitude:", 
         required=True, 
-        widget=forms.TextInput(attrs={'class': 'form-control disabled-field', 'placeholder': 'e.g. -74.0060',})
+        widget=forms.TextInput(attrs={'class': 'form-control disabled-field',})
     )

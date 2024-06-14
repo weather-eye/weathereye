@@ -23,6 +23,11 @@ body {
     transition: background-color 0.3s;
   }
 
+  .dark-text {
+    color: #515151;
+    font-weight: bold;
+  }
+
   .button-blue {
     background-color: #1874cd;
   }
@@ -45,6 +50,19 @@ body {
 
   .button-red:hover {
     background-color: #bb2b3a;
+  }
+
+  .shutdown-h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: #dc3545;
+  }
+
+  .shutdown-p {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: #666;
   }
 
   .success-h1 {
@@ -104,6 +122,10 @@ body {
     font-weight: bold;
     color: #515151;
   }
+
+  .password-field {
+    margin-bottom: 1.8rem;
+  }
   
   .form-control {
     width: 100%;
@@ -141,6 +163,27 @@ body {
     transform: scale(1);
   }
 
+  .btn-submit {
+    background-color: #4ccb3d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+  
+  .btn-submit:hover {
+    background-color: #38a02c;
+    transform: scale(1.05);
+  }
+  
+  .btn-submit:active {
+    background-color: #30b022;
+    transform: scale(1);
+  }
+
   .tab-container {
     overflow-x: auto;
   }
@@ -159,7 +202,7 @@ body {
     text-decoration: none;
     flex-grow: 1;
     font-size: 16px;
-    cursor: pointer;
+    /* cursor: pointer; */
     border-bottom: 2px solid transparent;
   }
   
@@ -246,28 +289,6 @@ body {
     margin-right: 4px;
   }
 
-  /* CSS for Configuration Instructions */
-  .note {
-    margin-top: 10px;
-    font-style: italic;
-  }
-
-  ul li {
-    margin-bottom: 10px;
-    color: #333;
-    margin-bottom: 20px;
-  }
-
-  ul li div {
-      margin-top: 5px;
-      margin-left: 20px;
-  }
-
-  ul li span.label {
-      color: #5b5a5a;
-      font-weight: bold;
-  }
-
   /* Progress bar css */
   #progress-container {
     width: 100%;
@@ -287,4 +308,74 @@ body {
   }
   #status {
       margin-top: 20px;
+  }
+
+  /* Password eye icon */
+  .password-toggle-icon {
+    /* position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%); */
+    cursor: pointer;
+  }
+  
+  .password-toggle-icon i {
+    font-size: 15px;
+    line-height: 1;
+    color: #666666;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .password-toggle-icon i:hover {
+    color: #3b3b3b;
+  }
+
+  /* Style for next buttons */
+  .next-btn {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .btn-continue {
+    display: flex;
+    justify-content: right;
+  }
+
+  /* hide class */
+  .hide {
+    display: none;
+  }
+
+  /* summary page styling */
+  .summary-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 50px 0px;
+  }
+
+  div.summary-container label {
+    font-weight: normal;
+    font-size: small;
+    color: #a9a9a9;    
+  }
+
+  div.summary-container input {
+    color: #8d8d8d;    
+  }
+
+  .summary-item {
+    flex: 0 1 45%;
+    box-sizing: border-box;
+    margin: 10px;
+  }
+
+  .summary-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px dashed #ccc;
+    padding: 5px 0;
+    background-color: transparent;
+    color: #333;
+    font-size: 16px;
+    pointer-events: none;
   }

@@ -1,5 +1,6 @@
 import os
 import signal
+import threading
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -36,23 +37,6 @@ def configure_surface(request):
             with open(remote_hosts_file, 'r') as file:
                 lines = file.readlines()
 
-            # Find the index of the [remote] section
-            remote_index = None
-            for index, line in enumerate(lines):
-                if line.strip() == '[remote]':
-                    remote_index = index
-                    break
-
-            # If the [remote] section is found, modify the content
-            if remote_index is not None:
-                # Keep everything before the [remote] section and add the new content
-                new_lines = lines[:remote_index + 1]
-                new_lines.append(f'\n{form.cleaned_data["host"].strip()}')
-
-                # Write the modified contents back to the file
-                with open(remote_hosts_file, 'w') as file:
-                    file.writelines(new_lines)
-
             # Read the contents of the production.env
             with open(prod_env_path, 'r') as file:
                 prod_lines = file.readlines()
@@ -75,6 +59,23 @@ def configure_surface(request):
 
             # write out remote host connection details 
             if install_type == "remote":
+                # Find the index of the [remote] section
+                remote_index = None
+                for index, line in enumerate(lines):
+                    if line.strip() == '[remote]':
+                        remote_index = index
+                        break
+
+                # If the [remote] section is found, modify the content
+                if remote_index is not None:
+                    # Keep everything before the [remote] section and add the new content
+                    new_lines = lines[:remote_index + 1]
+                    new_lines.append(f'\n{form.cleaned_data["host"].strip()}')
+
+                    # Write the modified contents back to the file
+                    with open(remote_hosts_file, 'w') as file:
+                        file.writelines(new_lines)
+
                 with open(remote_connection_password_file_path, 'w') as remote_connection_password_file:
                     remote_connection_password_file.write(form.cleaned_data["remote_connect_password"])
                 
@@ -134,13 +135,19 @@ def configure_surface(request):
             # redirect to success page
             return render(request, 'wx_web_app/success.html')  # Redirect to success page
     else:
-        form = SurfaceConfigurationForm()
-    return render(request, 'wx_web_app/configuration.html', {'form': form})
+        form = SurfaceConfigurationForm() # form
+        user_home_dir = os.path.expanduser('~') # users home directory to preload into surface_repo_path
+    return render(request, 'wx_web_app/configuration.html', {'form': form, 'user_home_dir': user_home_dir,})
 
 def shutdown(request):
+
+    return render(request, 'wx_web_app/shutdown.html')
+
+def shutdown_server(request):
     # Send termination signal to the current process
     os.kill(os.getpid(), signal.SIGINT)
-    return HttpResponse("Return to the Terminal to continue SURFACE installation...")
+
+    return HttpResponse('Server shutting down...')
 
 def get_install_progress(request):
     progress_file_path = os.path.join(settings.STATIC_DIR, 'misc', 'progress')

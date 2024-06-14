@@ -7,6 +7,10 @@ import time
 import weathereye.weathereye as ex
 
 
+# path to pipx weathereye virtual environment
+venv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'bin', 'activate')
+
+
 @click.group()
 def main(args=None):
     """weathereye command-line interface"""
@@ -17,8 +21,6 @@ def main(args=None):
 @main.command()
 def venv():
     """WeatherEye venv command, run this command before installing anything with weathereye."""
-    # path to pipx weathereye virtual environment
-    venv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'bin', 'activate')
     
     click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
     click.echo(click.style(f"source {venv_path}", fg='yellow'))
@@ -37,6 +39,24 @@ def install():
 @click.option("--remote", "-r", is_flag=True, help="Install SURFACE on a remote machine")
 
 def surface(remote, sudo_password):
+    # check if weathereye venv is activated
+    venv_name = 'weathereye'
+
+    if 'VIRTUAL_ENV' in os.environ:
+        current_venv = os.path.basename(os.environ['VIRTUAL_ENV'])
+        if current_venv == venv_name:
+            click.echo(f"Virtual environment '{venv_name}' is activated.", fg='green')
+        else:
+            click.echo(f"Warning: Virtual environment '{venv_name}' is not activated. Current active venv is '{current_venv}'.", fg='red')
+            click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
+            click.echo(click.style(f"source {venv_path}", fg='yellow'))
+            return False
+    else:
+        click.echo(f"Warning: Virtual environment '{venv_name}' is not activated. Current active venv is '{current_venv}'.", fg='red')
+        click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
+        click.echo(click.style(f"source {venv_path}", fg='yellow'))
+        return False
+    
     # path to sudo password
     sudo_password_file_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'env', 'become_password')
 

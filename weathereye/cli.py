@@ -52,7 +52,7 @@ def surface(remote, sudo_password):
             click.echo(click.style(f"source {venv_path}", fg='yellow'))
             return False
     else:
-        click.echo(f"Warning: Virtual environment '{venv_name}' is not activated. Current active venv is '{current_venv}'.", fg='red')
+        click.echo(f"Warning: Virtual environment '{venv_name}' is not activated.", fg='red')
         click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
         click.echo(click.style(f"source {venv_path}", fg='yellow'))
         return False

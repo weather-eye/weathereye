@@ -1,6 +1,7 @@
 import os
 import signal
 import threading
+import pwd
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -136,7 +137,15 @@ def configure_surface(request):
             return render(request, 'wx_web_app/success.html')  # Redirect to success page
     else:
         form = SurfaceConfigurationForm() # form
-        user_home_dir = os.path.expanduser('~') # users home directory to preload into surface_repo_path
+
+        # Get the current user's username
+        username = os.getlogin()
+        # Retrieve the home directory for the current user
+        home_directory = pwd.getpwnam(username).pw_dir
+
+        # users home directory to preload into surface_repo_path
+        user_home_dir = home_directory
+
     return render(request, 'wx_web_app/configuration.html', {'form': form, 'user_home_dir': user_home_dir,})
 
 def shutdown(request):

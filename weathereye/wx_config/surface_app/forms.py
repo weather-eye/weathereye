@@ -1,5 +1,5 @@
 from django import forms
-from config_app.models import InstallType
+from .models import InstallType
 
 class SurfaceConfigurationForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -7,7 +7,7 @@ class SurfaceConfigurationForm(forms.Form):
         
         install_type = InstallType.objects.last()
         
-        if install_type and install_type.type == 'remote':
+        if install_type and install_type.install_type == 'remote':
             self.fields['host'] = forms.CharField(
                 label="Remote Host for SURFACE install:", 
                 required=True, 
@@ -28,7 +28,7 @@ class SurfaceConfigurationForm(forms.Form):
                 required=True, 
                 widget=forms.PasswordInput(attrs={'class': 'form-control',})
             )
-        elif install_type and install_type.type == 'local':
+        elif install_type and install_type.install_type == 'local':
             self.fields['local_root_password'] = forms.CharField(
                 label="Sudo password:", 
                 required=True, 

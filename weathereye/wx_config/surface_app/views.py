@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
 from .forms import SurfaceConfigurationForm
-from config_app.models import InstallType
+from .models import InstallType
 
 
 # path to remote connection file
@@ -38,7 +38,7 @@ def configure_surface(request):
 
             # write out remote host connection details 
             install_type = InstallType.objects.last()
-            if install_type.type == 'remote':
+            if install_type.install_type == 'remote':
                 # Find the index of the [remote] section
                 remote_index = None
                 for index, line in enumerate(lines):

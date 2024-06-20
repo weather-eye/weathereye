@@ -24,6 +24,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.DS_Store
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -54,6 +55,10 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+db.sqlite3
+**/migrations/*
+!**/migrations/
+
 
 # Flask stuff:
 instance/

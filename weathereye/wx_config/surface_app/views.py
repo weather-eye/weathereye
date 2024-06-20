@@ -10,50 +10,31 @@ from .forms import SurfaceConfigurationForm
 from config_app.models import InstallType
 
 
+# path to remote connection file
+remote_connection_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'connection_password')
+
+# path to root user password file
+sudo_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'become_password')
+
+# path to surface variables file
+variable_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'extravars',)
+
+# path to production.env file
+prod_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'production.env',)
+
+# path to remote hosts path
+remote_hosts_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'inventory', 'hosts')
+
+
 def configure_surface(request):
     if request.method == 'POST':
         form = SurfaceConfigurationForm(request.POST)
         # Process the form data
         if form.is_valid():
-            # path to remote connection file
-            remote_connection_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'connection_password')
-
-            # path to root user password file
-            sudo_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'become_password')
-
-            # path to surface variables file
-            variable_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'extravars',)
-
-            # path to production.env file
-            prod_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'production.env',)
-            
             # write out remote host
-            # path to remote hosts path
-            remote_hosts_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'inventory', 'hosts')
-
             # Read the contents of the hosts file
             with open(remote_hosts_file, 'r') as file:
                 lines = file.readlines()
-
-            # Read the contents of the production.env
-            with open(prod_env_path, 'r') as file:
-                prod_lines = file.readlines()
-
-            # Find the index of the "# USER MODIFIED SETTINGS" section
-            prod_index = None
-            for index, line in enumerate(prod_lines):
-                if line.strip() == '# USER MODIFIED SETTINGS':
-                    prod_index = index
-                    break
-
-            # If the "# USER MODIFIED SETTINGS" section is found, modify the content
-            if prod_index is not None:
-                # Keep everything before the "# USER MODIFIED SETTINGS" section
-                prod_new_lines = prod_lines[:prod_index + 1]
-
-                # Write the modified contents back to the file
-                with open(prod_env_path, 'w') as file:
-                    file.writelines(prod_new_lines)
 
             # write out remote host connection details 
             install_type = InstallType.objects.last()
@@ -81,6 +62,29 @@ def configure_surface(request):
                 with open(sudo_password_file_path, 'w') as sudo_password_file:
                     sudo_password_file.write(form.cleaned_data["remote_root_password"])
 
+
+            # Read the contents of the production.env
+            with open(prod_env_path, 'r') as file:
+                prod_lines = file.readlines()
+
+
+            # Find the index of the "# USER MODIFIED SETTINGS" section
+            prod_index = None
+            for index, line in enumerate(prod_lines):
+                if line.strip() == '# USER MODIFIED SETTINGS':
+                    prod_index = index
+                    break
+
+            # If the "# USER MODIFIED SETTINGS" section is found, modify the content
+            if prod_index is not None:
+                # Keep everything before the "# USER MODIFIED SETTINGS" section
+                prod_new_lines = prod_lines[:prod_index + 1]
+
+                # Write the modified contents back to the file
+                with open(prod_env_path, 'w') as file:
+                    file.writelines(prod_new_lines)
+
+
             # write out surface variables
             with open(variable_file, 'w') as vf:
                 vf.write('---\n')
@@ -105,6 +109,7 @@ def configure_surface(request):
                 # path to production.env file
                 vf.write(f'"prod_env_path": "{prod_env_path}"\n')
 
+
             # Write out production.env variables
             with open(prod_env_path, 'a') as prod:
                 prod.write('\n\n')
@@ -125,6 +130,7 @@ def configure_surface(request):
                 prod.write(f'SPATIAL_ANALYSIS_INITIAL_LONGITUDE={form.cleaned_data["spatial_analysis_initial_longitude"]}\n')
                 prod.write(f'SPATIAL_ANALYSIS_FINAL_LATITUDE={form.cleaned_data["spatial_analysis_final_latitude"]}\n')
                 prod.write(f'SPATIAL_ANALYSIS_FINAL_LONGITUDE={form.cleaned_data["spatial_analysis_final_longitude"]}\n')
+
 
             # redirect to success page
             return render(request, 'wx_web_app/success.html')  # Redirect to success page

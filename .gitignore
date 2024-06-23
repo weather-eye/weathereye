@@ -58,6 +58,8 @@ local_settings.py
 db.sqlite3
 **/migrations/*
 !**/migrations/
+**/migrations/*
+**/artifacts/*
 
 
 # Flask stuff:

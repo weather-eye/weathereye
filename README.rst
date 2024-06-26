@@ -31,6 +31,12 @@ Linux
 Install
 -------
 
+Ensure that Redis is installed.
+
+.. code-block::
+
+    sudo apt install redis
+
 Ensure that Ansible is installed.
 
 .. code-block::

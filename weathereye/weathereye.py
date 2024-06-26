@@ -8,7 +8,7 @@ import ansible_runner
 wx_playbook_path = os.path.join(os.path.dirname(__file__), 'wx_playbook')
 
 # path to sudo password to start django playbook
-sudo_password_path = os.path.join(os.path.dirname(__file__), 'wx_playbook', 'env', 'become_password')
+sudo_password_path = os.path.join(wx_playbook_path, 'env', 'become_password')
 
 # extra variables file for wx configuration webapp playbook
 playbook_extravars = os.path.join(wx_playbook_path, 'env', 'extravars')

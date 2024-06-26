@@ -4,7 +4,8 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
-recursive-include weathereye/playbooks *
+recursive-include weathereye/wx_playbook *
+recursive-include weathereye/wx_config *
 
 recursive-include tests *
 recursive-exclude * __pycache__

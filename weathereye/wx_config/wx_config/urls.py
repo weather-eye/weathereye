@@ -21,5 +21,7 @@ from config_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='wx_configuration'),
-    path('install-surface', include('surface_app.urls')),
+    path('install-surface/', include('surface_app.urls')),
+    path('terminate-task/<celery_task_id>/', views.terminate_task, name='terminate_task_by_id'),
+    path('shutdown/', views.shutdown, name='shutdown'),
 ]

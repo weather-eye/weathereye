@@ -7,13 +7,24 @@ import ansible_runner
 # path containing wx configuration playbook
 wx_playbook_path = os.path.join(os.path.dirname(__file__), 'wx_playbook')
 
-# path to sudo password
+# path to sudo password to start django playbook
 sudo_password_path = os.path.join(os.path.dirname(__file__), 'wx_playbook', 'env', 'become_password')
+
+# extra variables file for wx configuration webapp playbook
+playbook_extravars = os.path.join(wx_playbook_path, 'env', 'extravars')
+
+# path to wx configuration webapp project folder
+webapp_project_path = os.path.join(os.path.dirname(__file__), 'wx_config')
+
 
 # retrieve and set SURFACE environment variables
 def wx_configuration(sudo_password):
     try:
-        # sudo password required for wx_configuratio playbook executeion
+        # configure web app playbook to django webapp folder path
+        with open(playbook_extravars, 'w') as extravars_file:
+            extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
+
+        # sudo password required for django web app playbook executeion
         with open(sudo_password_path, 'w') as sudo_password_file:
             sudo_password_file.write(sudo_password)
 

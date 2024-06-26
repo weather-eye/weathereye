@@ -1,0 +1,239 @@
+
+<!-- templates/run_playbook.html -->
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <link rel="icon" type="image/png" href="{% static 'surface_app/images/circle_logo_small.png' %}">
+    <link rel="stylesheet" href="{% static 'surface_app/css/style.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <title>Configuration</title>
+
+    <style>
+        /* loading function */
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+        }
+
+        #loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 80px; /* Larger width */
+            height: 80px; /* Larger height */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-container" id="loader-container">
+        <div id="loader"></div>
+    </div>
+
+    <div id="content">
+        <!-- Home button -->
+        <a href="{% url 'wx_configuration' %}" id="home-button" class="btn-primary"><i class="fas fa-home"></i></a>
+
+        <div class="logo"></div>
+
+        <section>
+            <h1 class="success-h1">Configuration Successful!</h1>
+            <p class="success-p">Your SURFACE environment variables have been saved.</p>
+        
+            <h3>Surface Installation in Progress</h3>
+            <div id="progress-container">
+                <div id="progress-bar"><span style="padding-left: 5px; padding-right: 5px;">0%</span></div>
+            </div>
+            <div>
+                <span id="status">Loading...</span>
+            </div>
+        
+            <div class="btn-center">
+                <button id="toggleModeButton" class="button button-grey">
+                    <i id="toggleIcon" class="far fa-eye" aria-hidden="true"></i>
+                </button>
+                
+                <a href="{% url 'terminate_task_by_id' celery_task_id=task_id %}" id="terminate_btn" class="button button-orange">Terminate Task</a>
+
+                <!-- <a href="{ url 'retry-config' }" id="retry_btn" class="button button-orange hide"><i class="fa fa-repeat" aria-hidden="true"></i> Retry</a> -->
+
+                <a href="{% url 'shutdown' %}" class="button button-red">Exit</a>
+            </div>
+
+            <div id="outputContainer" class="output-container">
+                <pre id="output"></pre>
+            </div>
+
+            
+        </section>
+    </div>
+
+    <script>
+        // getting task output
+        var task_id = "{{ task_id }}";
+
+        // control to check if process has hanged
+        var check_hang = false;
+
+        setTimeout(() => {check_hang = true;}, 2 * 60 * 1000); // 2 minutes delay
+  
+        // get task status
+        function pollTaskStatus(taskId) {
+            const interval = setInterval(() => {
+                fetch(`/install-surface/task-status/${taskId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'SUCCESS' || data.status === 'FAILURE') {
+                            document.getElementById("terminate_btn").classList.add("hide");
+
+                            // document.getElementById("retry_btn").classList.remove("hide");
+                            
+                            clearInterval(interval);
+                        }
+
+                        const outputElement = document.getElementById('output');
+
+                        outputElement.textContent = ""
+                        let progress_count = 0
+
+                        data.events.forEach(event => {
+                            outputElement.textContent += `${event.stdout}`;
+                            progress_count += 1
+                        });
+
+                        outputElement.textContent += '\n\nStatus: ' + data.status;
+
+                        // Check if there are at least 2 events & if time has elasped to check if process hung
+                        if (check_hang == true && data.events.length >= 2) {
+
+                            const secondToLastEvent = data.events[data.events.length - 2];
+
+                            if (/gathering facts/i.test(secondToLastEvent.stdout)) {
+                                // Simulate a click on the terminate button
+                                document.getElementById('terminate_btn').click();
+                            }
+                                                        
+                        }
+
+                        // Scroll to bottom after adding new content
+                        outputElement.scrollTop = outputElement.scrollHeight;
+
+                        // update the progress bar
+                        const progressBar = document.getElementById('progress-bar');
+                        const status = document.getElementById('status');
+                        let progress = progress_count;
+                        let percentage = 0;
+
+                        function updateProgressBar() {// Function to update progress bar
+                            if (data.status === 'FAILURE') {
+                                progressBar.style.width = '100%';
+                                progressBar.style.backgroundColor = 'red';
+                                progressBar.textContent = 'Install Failed';
+                                status.textContent = 'Install Failed';
+                            } else if (data.status === 'SUCCESS') {
+                                progressBar.style.width = '100%';
+                                progressBar.style.backgroundColor = '#4caf50';
+                                progressBar.textContent = '100%';
+                                status.textContent = 'Loading Complete';
+                            } else if (progress <= 80) {
+                                percentage = Math.min(progress * 100 / 85, 100);
+                                progressBar.style.width = Math.floor(percentage) + '%';
+                                progressBar.textContent = Math.floor(percentage) + '%';
+                                status.textContent = 'Loading...';
+                            } else {
+                                percentage = Math.min(80 * 100 / 85, 100);
+                                progressBar.style.width = Math.floor(percentage) + '%';
+                                progressBar.textContent = Math.floor(percentage) + '%';
+                                status.textContent = 'Loading...';
+                            }
+                        }
+
+                        setTimeout(updateProgressBar, 1000); // Delay of 1000 milliseconds (1 second)
+
+                    });
+            }, 2000); // Poll every 2 seconds
+
+        }
+
+        // $(document).ready(function() {
+        //   pollTaskStatus(task_id)
+        // });
+        
+        // Async function to handle the loading and displaying of content
+        async function handleLoading() {
+            var loaderContainer = document.getElementById('loader-container');
+            var loader = document.getElementById('loader');
+            var content = document.getElementById('content');
+
+            // Add 'hide' class to loader initially
+            content.classList.add('hide');
+
+            // get task status
+            pollTaskStatus(task_id)
+
+            // after 2 min check if the process hanged while gathering facts
+            setTimeout(() => {check_hang = true;}, 2 * 60 * 1000); // 2 minutes delay
+
+            // Wait for an additional 3 seconds before displaying the content
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // Remove 'hide' class from content to display it
+            content.classList.remove('hide');
+            // Hide loader by adding 'hide' class back
+            loaderContainer.classList.add('hide');
+            loaderContainer.classList.remove('loader-container');
+        }
+
+        // Wait for the DOM content to fully load
+        document.addEventListener('DOMContentLoaded', handleLoading);
+
+        // Function to toggle between light and dark mode for output
+        function toggleOutputMode() {
+            var outputElement = document.getElementById('output');
+            outputElement.classList.toggle('dark-mode');
+
+            // Toggle button text and icon based on current mode
+            var toggleButton = document.getElementById('toggleModeButton');
+            var toggleIcon = document.getElementById('toggleIcon');
+            if (outputElement.classList.contains('dark-mode')) {
+                toggleIcon.classList.remove('far', 'fa-eye');
+                toggleIcon.classList.add('fas', 'fa-eye');
+            } else {
+                toggleIcon.classList.remove('fas', 'fa-eye');
+                toggleIcon.classList.add('far', 'fa-eye');
+            }
+        }
+
+        // Event listener for the toggle mode button
+        document.getElementById('toggleModeButton').addEventListener('click', function() {
+            toggleOutputMode();
+        });
+
+        // Function to scroll to the bottom of the div
+        function scrollToBottom() {
+            var scrollableDiv = document.getElementById("output");
+            scrollableDiv.scrollTop = scrollableDiv.scrollHeight;
+        }
+
+        // Call scrollToBottom() when the page loads or when content changes
+        document.addEventListener("DOMContentLoaded", scrollToBottom);
+
+    </script>
+</body>
+</html>

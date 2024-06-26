@@ -32,12 +32,55 @@
       ignore_errors: true
   
   # ensures django 4.1 is install
-    - name: Install required packages
-      ansible.builtin.shell: pip install --upgrade django==4.1
+    # - name: Install required packages
+    #   ansible.builtin.shell: pip install --upgrade django==4.1
+
+  # downloading redis and pip on mac machines
+    - name: Install required packages (mac)
+      community.general.homebrew:
+        name: redis
+        state: present
+        update_homebrew: true
+      when: ansible_distribution in ['MacOSX']
+
+  # downloading redis and pip on ubuntu machines
+    - name: Update apt cache
+      apt:
+        update_cache: true
+      retries: 2
+      delay: 60 # Wait 1 minute between retires
+      when: ansible_distribution in ['Ubuntu']
+
+    - name: Install required packages (Ubuntu)
+      apt:
+        pkg:
+          - python3-pip
+          - redis
+        state: latest
+      when: ansible_distribution in ['Ubuntu']
+
+  # start redis
+    - name: Start redis
+      ansible.builtin.shell: redis-server --port 52377
+      poll: 0
   
+  # run database migrations
+    - name: Make migrations
+      ansible.builtin.shell: python3 manage.py resetdb
+      args:
+        chdir: "{{ django_webapp_path }}"
+
   # starting configuration site
     - name: Start configuration site
       ansible.builtin.shell: python3 manage.py runserver localhost:52376
+      args:
+        chdir: "{{ django_webapp_path }}"
+      async: 10800
+      poll: 0
+
+  # start celery worker
+    - name: Start celery worker
+      ansible.builtin.shell: python3 -m celery -A wx_config worker
       args:
         chdir: "{{ django_webapp_path }}"
       async: 10800

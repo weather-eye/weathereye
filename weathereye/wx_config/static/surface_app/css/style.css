@@ -28,12 +28,12 @@ body {
     font-weight: bold;
   }
 
-  .button-blue {
-    background-color: #1874cd;
+  .button-grey {
+    background-color: #949494;
   }
 
-  .button-blue:hover {
-    background-color: #dc3545;
+  .button-grey:hover {
+    background-color: #757575;
   }
 
   .button-green {
@@ -46,10 +46,22 @@ body {
 
   .button-red {
     background-color: #dc3545;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
   }
 
   .button-red:hover {
     background-color: #bb2b3a;
+    transform: scale(1.05);
+  }
+
+  .button-orange {
+    background-color: #F7813E;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+
+  .button-orange:hover {
+    background-color: #E06C2E;
+    transform: scale(1.05);
   }
 
   .shutdown-h1 {
@@ -240,6 +252,20 @@ body {
     margin-bottom: 1.5rem;
   }
   
+  /* Style for home buttons */
+  #home-button {
+    position: absolute;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    top: 20px;
+    left: 20px;
+  }
+
+
   /* Style for scroll buttons */
   .scroll-btn {
     position: fixed;
@@ -378,4 +404,28 @@ body {
     color: #333;
     font-size: 16px;
     pointer-events: none;
+  }
+
+  /* terminal installation output */
+  .output-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #output {
+    padding: 0px 20px;
+    border: 1px solid #ccc;
+    letter-spacing: 3px;
+    border-radius: 10px;
+    line-height: 2.5;
+    max-height: 45vh;
+    overflow: auto; /* Enables both vertical and horizontal scrolling */
+    font-family: monospace; /* Sets a monospace font for code display */
+    white-space: pre-wrap; /* Wraps long lines without breaking words */
+  }
+
+  .dark-mode {
+    background-color: black;
+    color: white;
   }

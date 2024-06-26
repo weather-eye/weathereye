@@ -11,7 +11,7 @@ class SurfaceConfigurationForm(forms.Form):
             self.fields['host'] = forms.CharField(
                 label="Remote Host for SURFACE install:", 
                 required=True, 
-                widget=forms.TextInput(attrs={'class': 'form-control',})
+                widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'eg.. xxx.xx.xxx.xx@username'})
             )
             self.fields['surface_repo_path'] = forms.CharField(
                 label="Path on remote machine to clone SURFACE repository:", 
@@ -23,17 +23,12 @@ class SurfaceConfigurationForm(forms.Form):
                 required=True, 
                 widget=forms.PasswordInput(attrs={'class': 'form-control',})
             )
-            self.fields['remote_root_password'] = forms.CharField(
+            self.fields['root_password'] = forms.CharField(
                 label="Root password on the remote machine:", 
                 required=True, 
                 widget=forms.PasswordInput(attrs={'class': 'form-control',})
             )
         elif install_type and install_type.install_type == 'local':
-            self.fields['local_root_password'] = forms.CharField(
-                label="Sudo password:", 
-                required=True, 
-                widget=forms.PasswordInput(attrs={'class': 'form-control',})
-            )
             self.fields['surface_repo_path'] = forms.CharField(
                 label="Path to clone SURFACE repository:", 
                 required=True, 

@@ -125,9 +125,6 @@ function initializeSpatialMap() {
             var startingCoordinates = bounds.getSouthWest();
             var endingCoordinates = bounds.getNorthEast();
 
-            console.log("Starting Coordinates:", startingCoordinates);
-            console.log("Ending Coordinates:", endingCoordinates);
-
             // Update the input fields
             document.querySelector('[name="spatial_analysis_initial_latitude"]').value = startingCoordinates.lat;
             document.querySelector('[name="spatial_analysis_initial_longitude"]').value = startingCoordinates.lng;
@@ -250,11 +247,11 @@ if (currentTab == 5) {
                         { id: 'spatial_analysis_final_longitude', summaryId: 'summary15' }
                     ];
 
-    "{% if form.remote_connect_password %}"
-    formFields.push({ id: 'host', summaryId: 'summary1' }, 
-                    { id: 'remote_connect_password', summaryId: 'summary2' }, 
-                    { id: 'remote_root_password', summaryId: 'summary3' },
-                    )
+    "{% if install_type == 'remote' %}"
+        formFields.push({ id: 'host', summaryId: 'summary1' }, 
+                        { id: 'remote_connect_password', summaryId: 'summary2' }, 
+                        { id: 'root_password', summaryId: 'summary3' },
+                        )
     "{% endif %}"
 
     formFields.forEach(field => {

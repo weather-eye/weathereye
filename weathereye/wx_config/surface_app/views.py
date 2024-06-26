@@ -1,139 +1,48 @@
 import os
-import signal
-import threading
 import pwd
 
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 from django.conf import settings
 from .forms import SurfaceConfigurationForm
-from .models import InstallType
+from .models import InstallType, AnsibleRun
+from .tasks import install_surface, get_ansible_task_status
+from .utils import process_form
 
+# project directory and playbook name variables
+project_dir = "" 
+playbook_name = ""
 
-# path to remote connection file
-remote_connection_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'connection_password')
-
-# path to root user password file
-sudo_password_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'become_password')
-
-# path to surface variables file
-variable_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'extravars',)
-
-# path to production.env file
-prod_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'env', 'production.env',)
-
-# path to remote hosts path
-remote_hosts_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'inventory', 'hosts')
-
-
+# surface configuration view
 def configure_surface(request):
+    # Fetch the latest AnsibleRun and its status
+    latest_ansible_run = AnsibleRun.objects.last()
+    latest_status = latest_ansible_run.status if latest_ansible_run else None
+
+    # Check if the status is valid and if any InstallType exists
+    if not latest_status:
+        install_type = InstallType.objects.last() # get installation type (remote or local)
+    else:
+        return redirect(reverse('wx_configuration')) # redirecting to the home page
+
     if request.method == 'POST':
         form = SurfaceConfigurationForm(request.POST)
         # Process the form data
         if form.is_valid():
-            # write out remote host
-            # Read the contents of the hosts file
-            with open(remote_hosts_file, 'r') as file:
-                lines = file.readlines()
 
-            # write out remote host connection details 
-            install_type = InstallType.objects.last()
-            if install_type.install_type == 'remote':
-                # Find the index of the [remote] section
-                remote_index = None
-                for index, line in enumerate(lines):
-                    if line.strip() == '[remote]':
-                        remote_index = index
-                        break
+            # process configuration data
+            global project_dir, playbook_name 
+            
+            project_dir, playbook_name = process_form(form, install_type)
+            
+            task = install_surface.apply_async(args=[project_dir, playbook_name, install_type.install_type])
 
-                # If the [remote] section is found, modify the content
-                if remote_index is not None:
-                    # Keep everything before the [remote] section and add the new content
-                    new_lines = lines[:remote_index + 1]
-                    new_lines.append(f'\n{form.cleaned_data["host"].strip()}')
+            url = reverse('config-complete', kwargs={'task_id': task.id})
 
-                    # Write the modified contents back to the file
-                    with open(remote_hosts_file, 'w') as file:
-                        file.writelines(new_lines)
+            return redirect(url) # Redirect to config_complete page
 
-                with open(remote_connection_password_file_path, 'w') as remote_connection_password_file:
-                    remote_connection_password_file.write(form.cleaned_data["remote_connect_password"])
-                
-                with open(sudo_password_file_path, 'w') as sudo_password_file:
-                    sudo_password_file.write(form.cleaned_data["remote_root_password"])
-
-
-            # Read the contents of the production.env
-            with open(prod_env_path, 'r') as file:
-                prod_lines = file.readlines()
-
-
-            # Find the index of the "# USER MODIFIED SETTINGS" section
-            prod_index = None
-            for index, line in enumerate(prod_lines):
-                if line.strip() == '# USER MODIFIED SETTINGS':
-                    prod_index = index
-                    break
-
-            # If the "# USER MODIFIED SETTINGS" section is found, modify the content
-            if prod_index is not None:
-                # Keep everything before the "# USER MODIFIED SETTINGS" section
-                prod_new_lines = prod_lines[:prod_index + 1]
-
-                # Write the modified contents back to the file
-                with open(prod_env_path, 'w') as file:
-                    file.writelines(prod_new_lines)
-
-
-            # write out surface variables
-            with open(variable_file, 'w') as vf:
-                vf.write('---\n')
-                # write surface_repo_path
-                surface_repo_path = form.cleaned_data['surface_repo_path'].strip()
-                if surface_repo_path[-1] == "/":
-                    vf.write(f'"surface_repo_path": "{surface_repo_path}surface/"\n')
-                else:
-                    vf.write(f'"surface_repo_path": "{surface_repo_path}/surface/"\n')
-                # write with_data
-                vf.write(f'"with_data": "{form.cleaned_data["with_data"]}"\n')
-                # write data file path
-                vf.write(f'"data_path": "{form.cleaned_data["data_path"]}"\n')
-                # write data filename
-                vf.write(f'"data_file_name": "{form.cleaned_data["data_path"].strip("/").split("/")[-1]}"\n')
-                # write admin
-                vf.write(f'"admin": "{form.cleaned_data["admin"].strip()}"\n')
-                # write admin_email
-                vf.write(f'"admin_email": "{form.cleaned_data["admin_email"].strip()}"\n')
-                # write admin_password
-                vf.write(f'"admin_password": "{form.cleaned_data["admin_password"]}"\n')
-                # path to production.env file
-                vf.write(f'"prod_env_path": "{prod_env_path}"\n')
-
-
-            # Write out production.env variables
-            with open(prod_env_path, 'a') as prod:
-                prod.write('\n\n')
-                prod.write(f'LRGS_USER={form.cleaned_data["lrgs_user"].strip()}\n')
-                prod.write(f'LRGS_PASSWORD={form.cleaned_data["lrgs_password"]}\n')
-                
-                prod.write('\n')
-                prod.write(f'TIMEZONE_NAME={form.cleaned_data["timezone_name"].strip()}\n')
-                prod.write(f'TIMEZONE_OFFSET={form.cleaned_data["timezone_offset"]}\n')
-
-                prod.write('\n')
-                prod.write(f'MAP_LATITUDE={form.cleaned_data["map_latitude"]}\n')
-                prod.write(f'MAP_LONGITUDE={form.cleaned_data["map_longitude"]}\n')
-                prod.write(f'MAP_ZOOM={form.cleaned_data["map_zoom"]}\n')
-
-                prod.write('\n')
-                prod.write(f'SPATIAL_ANALYSIS_INITIAL_LATITUDE={form.cleaned_data["spatial_analysis_initial_latitude"]}\n')
-                prod.write(f'SPATIAL_ANALYSIS_INITIAL_LONGITUDE={form.cleaned_data["spatial_analysis_initial_longitude"]}\n')
-                prod.write(f'SPATIAL_ANALYSIS_FINAL_LATITUDE={form.cleaned_data["spatial_analysis_final_latitude"]}\n')
-                prod.write(f'SPATIAL_ANALYSIS_FINAL_LONGITUDE={form.cleaned_data["spatial_analysis_final_longitude"]}\n')
-
-
-            # redirect to success page
-            return render(request, 'wx_web_app/success.html')  # Redirect to success page
     else:
         form = SurfaceConfigurationForm() # form
 
@@ -145,31 +54,30 @@ def configure_surface(request):
         # users home directory to preload into surface_repo_path
         user_home_dir = home_directory
 
-    return render(request, 'surface_app/configuration.html', {'form': form, 'user_home_dir': user_home_dir,})
+    return render(request, 'surface_app/configuration.html', {'form': form, 'user_home_dir': user_home_dir, 'install_type':  install_type.install_type, })
 
 
-def shutdown(request):
+# get the status of the current task
+@require_GET
+def task_status(request, task_id):
+    task_status = get_ansible_task_status(task_id)
 
-    return render(request, 'surface_app/shutdown.html')
+    return JsonResponse(task_status)
 
 
-def shutdown_server(request):
-    # Send termination signal to the current process
-    os.kill(os.getpid(), signal.SIGINT)
+# config_complete page view
+def config_complete(request, task_id):
+    # check if task id exists if not redirect to the home page (wx_configuration)
+    if InstallType.objects.exists():
+        return render(request, 'surface_app/config_complete.html', {'task_id': task_id})
+    else:
+        return redirect(reverse('wx_configuration'))
+    
 
-    return HttpResponse('Server shutting down...')
+# # retry configuration with the same env variables
+# def retry_config(request):
+#     task = install_surface.apply_async(args=[project_dir, playbook_name])
 
-# def get_install_progress(request):
-#     progress_file_path = os.path.join(settings.STATIC_DIR, 'misc', 'progress')
+#     url = reverse('config-complete', kwargs={'task_id': task.id})
 
-#     try:
-#         with open(progress_file_path, 'r') as file:
-#             content = file.read()
-#         return HttpResponse(content, content_type='text/plain')
-#     except Exception as e:
-#         return HttpResponse(str(e), status=500)
-
-# def simulate_progress(request):
-#     with open(os.path.join(settings.STATIC_DIR, 'misc', 'progress'), 'a') as file:
-#         file.write('p')
-#     return HttpResponse('File updated successfully')
+#     return redirect(url) # Redirect to config_complete page

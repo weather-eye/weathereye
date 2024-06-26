@@ -37,6 +37,12 @@ Ensure that Ansible is installed.
 
     sudo apt install ansible
 
+Ensure that PIPX is installed.
+
+.. code-block::
+
+    sudo apt install pipx
+
 To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
 
 .. code-block::

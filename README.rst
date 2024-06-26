@@ -31,11 +31,11 @@ Linux
 Install
 -------
 
-Ensure that pip is installed.
+Ensure that Ansible is installed.
 
 .. code-block::
 
-    sudo apt install pip
+    sudo apt install ansible
 
 To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
 

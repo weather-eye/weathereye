@@ -31,11 +31,23 @@ Linux
 Install
 -------
 
-Ensure that pip is installed.
+Ensure that Redis is installed.
 
 .. code-block::
 
-    sudo apt install pip
+    sudo apt install redis
+
+Ensure that Ansible is installed.
+
+.. code-block::
+
+    sudo apt install ansible
+
+Ensure that PIPX is installed.
+
+.. code-block::
+
+    sudo apt install pipx
 
 To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
 

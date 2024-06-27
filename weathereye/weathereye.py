@@ -1,5 +1,22 @@
 """Main module."""
 import os
+import site
+
+# Path to your virtual environment
+venv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
+
+# Set the VIRTUAL_ENV environment variable
+os.environ['VIRTUAL_ENV'] = venv_path
+
+# Add the virtual environment's site-packages to sys.path
+site_packages = os.path.join(venv_path, 'lib', 'python3.10', 'site-packages')
+site.addsitedir(site_packages)
+
+# Add the virtual environment's bin directory to the PATH environment variable
+bin_path = os.path.join(venv_path, 'bin')
+os.environ['PATH'] = bin_path + os.pathsep + os.environ.get('PATH', '')
+
+
 import click
 import ansible_runner
 

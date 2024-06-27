@@ -40,6 +40,7 @@ def wx_configuration(sudo_password):
         # configure web app playbook to django webapp folder path
         with open(playbook_extravars, 'w') as extravars_file:
             extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
+            extravars_file.write(f'\nvenv_path: {venv_path}')
 
         # sudo password required for django web app playbook executeion
         with open(sudo_password_path, 'w') as sudo_password_file:

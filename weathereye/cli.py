@@ -31,14 +31,14 @@ def install(sudo_password):
         if current_venv == venv_name:
             click.echo(click.style(f"Virtual environment '{venv_name}' is activated.", fg='green'))
         else:
-            click.echo(click.style(f"Warning: Virtual environment '{venv_name}' is not activated. Current active venv is '{current_venv}'.", fg='red'))
+            click.echo(click.style(f"Warning: There is a problem with virtual environment: '{venv_name}'", fg='red'))
             click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
-            click.echo(click.style(f"source {venv_path}", fg='yellow'))
+            click.echo(click.style(f"source {venv_path}", fg='green'))
             return False
     else:
-        click.echo(click.style(f"Warning: Virtual environment '{venv_name}' is not activated.", fg='red'))
+        click.echo(click.style(f"Warning: There is a problem with virtual environment: '{venv_name}'", fg='red'))
         click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))
-        click.echo(click.style(f"source {venv_path}", fg='yellow'))
+        click.echo(click.style(f"source {venv_path}", fg='green'))
         return False
     
     wx.wx_configuration(sudo_password) # begin wx configuration

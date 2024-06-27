@@ -30,10 +30,6 @@
         force: true
         status_code: 200
       ignore_errors: true
-  
-  # ensures django 4.1 is install
-    # - name: Install required packages
-    #   ansible.builtin.shell: pip install --upgrade django==4.1
 
   # downloading redis and pip on mac machines
     - name: Install required packages (MacOSX)
@@ -54,7 +50,6 @@
     - name: Install required packages (Ubuntu)
       apt:
         pkg:
-          - python3-pip
           - redis
           - sshpass
         state: latest
@@ -65,18 +60,22 @@
       ansible.builtin.shell: redis-server --port 52377
       async: 10800
       poll: 0
-  
+
   # run database migrations
     - name: Make migrations
-      ansible.builtin.shell: python3 manage.py resetdb
-      args:
-        chdir: "{{ django_webapp_path }}"
+      community.general.django_manage:
+        command: resetdb
+        project_path: "{{ django_webapp_path }}"
+        virtualenv: "{{ venv_path }}"
+      async: 10800
+      poll: 0
 
-  # starting configuration site
+  # Start configuration site
     - name: Start configuration site
-      ansible.builtin.shell: python3 manage.py runserver localhost:52376
-      args:
-        chdir: "{{ django_webapp_path }}"
+      community.general.django_manage:
+        command: runserver localhost:52376
+        project_path: "{{ django_webapp_path }}"
+        virtualenv: "{{ venv_path }}"
       async: 10800
       poll: 0
 

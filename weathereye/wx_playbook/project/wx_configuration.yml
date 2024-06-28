@@ -67,8 +67,6 @@
         command: resetdb
         project_path: "{{ django_webapp_path }}"
         virtualenv: "{{ venv_path }}"
-      async: 10800
-      poll: 0
 
   # Start configuration site
     - name: Start configuration site
@@ -76,8 +74,8 @@
         command: runserver localhost:52376
         project_path: "{{ django_webapp_path }}"
         virtualenv: "{{ venv_path }}"
-      async: 10800
-      poll: 0
+      # async: 10800
+      # poll: 0
 
   # start celery worker
     - name: Start celery worker

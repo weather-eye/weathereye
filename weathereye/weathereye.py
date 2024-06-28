@@ -3,7 +3,10 @@ import os
 import site
 
 # Path to your virtual environment
-venv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
+venv_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+
+# Path to venv activation script
+venv_activate = os.path.join(venv_path, 'bin', 'activate')
 
 # Set the VIRTUAL_ENV environment variable
 os.environ['VIRTUAL_ENV'] = venv_path
@@ -41,6 +44,7 @@ def wx_configuration(sudo_password):
         with open(playbook_extravars, 'w') as extravars_file:
             extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
             extravars_file.write(f'\nvenv_path: {venv_path}')
+            extravars_file.write(f'\nvenv_activate: {venv_activate}')
 
         # sudo password required for django web app playbook executeion
         with open(sudo_password_path, 'w') as sudo_password_file:

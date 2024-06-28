@@ -70,12 +70,11 @@
 
   # Start configuration site
     - name: Start configuration site
-      community.general.django_manage:
-        command: runserver localhost:52376
-        project_path: "{{ django_webapp_path }}"
-        virtualenv: "{{ venv_path }}"
-      # async: 10800
-      # poll: 0
+      shell: source "{{ venv_activate }}" && python3 manage.py runserver localhost:52376
+      args:
+        chdir: "{{ django_webapp_path }}"
+      async: 10800
+      poll: 0
 
   # start celery worker
     - name: Start celery worker

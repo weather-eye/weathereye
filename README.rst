@@ -31,17 +31,12 @@ Linux
 Install
 -------
 
-Ensure that Redis is installed.
+Update and Upgrade Packages
 
 .. code-block::
 
-    sudo apt install redis
-
-Ensure that Ansible is installed.
-
-.. code-block::
-
-    sudo apt install ansible
+    sudo apt install update
+    sudo apt install upgrade
 
 Ensure that PIPX is installed.
 

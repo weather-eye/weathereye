@@ -35,8 +35,8 @@ Update and Upgrade Packages
 
 .. code-block::
 
-    sudo apt install update
-    sudo apt install upgrade
+    sudo apt update
+    sudo apt upgrade
 
 Ensure that PIPX is installed.
 

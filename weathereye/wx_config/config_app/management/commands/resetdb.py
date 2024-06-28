@@ -27,7 +27,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'stale dump file not found'))
 
         # Remove migration files
-        for root, dirs, files in os.walk('../../..'):
+        for root, dirs, files in os.walk('..'):
             for file in files:
                 if file.endswith('.py') and 'migrations' in root and file != '__init__.py':
                     os.remove(os.path.join(root, file))

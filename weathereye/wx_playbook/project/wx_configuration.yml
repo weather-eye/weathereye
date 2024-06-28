@@ -54,6 +54,8 @@
           - sshpass
         state: latest
       when: ansible_distribution in ['Ubuntu']
+      ignore_errors: true
+    
 
   # start redis
     - name: Start redis

@@ -70,7 +70,7 @@
 
   # Start configuration site
     - name: Start configuration site
-      shell: source "{{ venv_activate }}" && python3 manage.py runserver localhost:52376
+      shell: python3 manage.py runserver localhost:52376
       args:
         chdir: "{{ django_webapp_path }}"
       async: 10800

@@ -30,7 +30,7 @@ body {
     margin-top: 20px;
 }
 
-.w2b-button, .surface-button, .oscar-button  {
+.w2b-button, .surface-button, .opencdms-button, .portal-button  {
     border: none;
     color: white;
     padding: 30px 50px;
@@ -56,15 +56,19 @@ body {
     background-color: #2196F3;
 }
 
-.oscar-button {
-    background-color: #6f42c1;
+.opencdms-button {
+    background-color: #ffa04e;
 }
 
-.w2b-button:hover, .surface-button:hover, .oscar-button:hover {
-    transform: scale(1.05);
+.portal-button {
+    background-color: #855bd3;
 }
 
-.w2b-button:focus, .surface-button:focus, .oscar-button:focus {
+.w2b-button:hover, .surface-button:hover, .opencdms-button:hover, .portal-button:hover {
+    animation: hoverAnimation 0.5s forwards;
+}
+
+.w2b-button:focus, .surface-button:focus, .opencdms-button:focus, .portal-button:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5);
 }
@@ -137,8 +141,15 @@ body {
     color: #fff;
 }
 
-.option-heading-oscar {
-    background-color: #6f42c1;
+.option-heading-opencdms {
+    background-color: #ffa04e;
+    border-radius: 10px 10px 0px 0px;
+    padding: 12px 16px;
+    color: #fff;
+}
+
+.option-heading-portal {
+    background-color: #855bd3;
     border-radius: 10px 10px 0px 0px;
     padding: 12px 16px;
     color: #fff;
@@ -199,4 +210,28 @@ body {
 
 .view-progress {
     margin-bottom: 10px;
+}
+
+/* Define the keyframes for the animation */
+@keyframes hoverAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* unavailable option styles */
+.unavailable {
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Change text color to red when hovered over */
+.unavailable:hover {
+    color: red;
 }

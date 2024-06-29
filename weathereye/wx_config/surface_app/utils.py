@@ -39,6 +39,9 @@ def replace_text_in_file(file_path, search_text, replace_text):
     with open(file_path, 'w') as file:
         file.write(new_content)
 
+    with open(file_path, 'a') as file:
+        file.write(f"\n\n\nsearch and replace text: {search_text}  {replace_text}. this shows that it actually worked lol")
+
 
 def write_out_surface_variables(form):
     # write out surface variables
@@ -111,9 +114,6 @@ def write_out_production_variables(form):
 def write_out_host_connection_details(form, install_type):
     # write out remote host connection details 
     if install_type.install_type == 'remote':
-
-        # modify ansible cfg file with the root username
-        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), f'become_user={getpass.getuser()}', 'become_user=root')
         
         # Read the contents of the hosts file
         with open(hosts_file_path, 'r') as file:
@@ -145,8 +145,6 @@ def write_out_host_connection_details(form, install_type):
             sudo_password_file.write(form.cleaned_data["root_password"])
 
     else:
-        # modify ansible cfg file with the current username
-        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), 'become_user=root', f'become_user={getpass.getuser()}')
 
         # on local installs write out a misc value to the connection password file
         with open(connection_password_file_path, 'w') as connection_password_file:
@@ -161,6 +159,13 @@ def write_out_host_connection_details(form, install_type):
 
 
 def process_form(form, install_type):
+
+    if install_type.install_type == "remote":
+        # modify ansible cfg file with the root username
+        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), f'become_user={getpass.getuser()}', 'become_user=root')
+    else:
+        # modify ansible cfg file with the current username
+        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), 'become_user=root', f'become_user={getpass.getuser()}')
 
     write_out_host_connection_details(form, install_type)
 

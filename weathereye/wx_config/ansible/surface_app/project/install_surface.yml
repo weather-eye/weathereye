@@ -116,6 +116,8 @@
             - cache
             - redis
             - api
+        become: false
+          
 
       # - name: Build docker images (This may take a while...)
       #   ansible.builtin.shell: docker compose build
@@ -132,32 +134,38 @@
         args:
           chdir: "{{ surface_repo_path }}"
         when: with_data in ['no', 'No', 'NO']
+        become: false
 
       - name: Start With Data (This may take a while...)
         ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ data_path }}"
         args:
           chdir: "{{ surface_repo_path }}"
         when: with_data in ['yes', 'Yes', 'YES']
+        become: false
 
       - name: Collect Static Files
         ansible.builtin.shell: docker compose exec api python manage.py collectstatic --noinput
         args:
           chdir: "{{ surface_repo_path }}"
+        become: false
 
       - name: Create Admin User
         ansible.builtin.shell: docker compose exec api sh -c "export DJANGO_SUPERUSER_USERNAME='{{ admin }}' && export DJANGO_SUPERUSER_EMAIL='{{ admin_email }}' && export DJANGO_SUPERUSER_PASSWORD='{{ admin_password }}' && python manage.py createsuperuser --noinput"
         args:
           chdir: "{{ surface_repo_path }}"
+        become: false
 
       - name: Stopping all containers
         community.docker.docker_compose_v2:
           project_src: "{{ surface_repo_path }}"
           state: stopped
+        become: false
 
       - name: Starting up SURFACE
         community.docker.docker_compose_v2:
           project_src: "{{ surface_repo_path }}"
           state: present
+        become: false
 
       - name: SURFACE installation complete!
         ansible.builtin.pause:

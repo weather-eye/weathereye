@@ -27,19 +27,19 @@ hosts_file_path = os.path.join(project_dir, 'inventory', 'hosts')
 
 
 def replace_text_in_file(file_path, search_text, replace_text):
-    # Read the content of the file
-    with open(file_path, 'r') as file:
-        file_content = file.read()
-    
-    # Replace the search text with the replacement text
-    new_content = file_content.replace(search_text, replace_text)
-    
-    # Write the modified content back to the file
-    with open(file_path, 'w') as file:
-        file.write(new_content)
-
-    with open(file_path, 'a') as file:
-        file.write(f"\n\n\nsearch and replace text: {search_text}  {replace_text}. this shows that it actually worked lol")
+    try:
+        # Read the content of the file
+        with open(file_path, 'r') as file:
+            file_content = file.read()
+        
+        # Replace the search text with the replacement text
+        new_content = file_content.replace(search_text, replace_text)
+        
+        # Write the modified content back to the file
+        with open(file_path, 'w') as file:
+            file.write(new_content)
+    except:
+        pass
 
 
 def write_out_surface_variables(form):

@@ -12,8 +12,7 @@
       - name: Update apt cache
         apt:
           update_cache: true
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
+        become: false
 
       - name: Install required system packages
         apt:
@@ -27,32 +26,36 @@
             - git
             - python3-setuptools
           state: latest
+        become: false
 
       - name: Remove docker-ce
         apt:
           name: docker-ce
           state: absent
+        become: false
 
       - name: Add Docker GPG apt Key
         apt_key:
           url: https://download.docker.com/linux/ubuntu/gpg
           state: present
+        become: false
 
       - name: Add Docker Repository
         apt_repository:
           repo: deb https://download.docker.com/linux/ubuntu jammy stable
           state: present
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
+        become: false
 
       - name: Install docker-ce
         apt:
           name: docker-ce
           state: latest
+        become: false
 
       - name: Install Docker Module for Python
         pip:
           name: docker
+        become: false
 
       - name: Tear down existing Docker services (if any) remove orphans and volumes
         community.docker.docker_compose_v2:
@@ -84,7 +87,6 @@
         ansible.builtin.copy:
           src: "{{ prod_env_path }}"
           dest: "{{ surface_repo_path }}api/"
-        become: false
 
       - name: Ensure pip version is less than 24.1 in Dockerfile
         ansible.builtin.lineinfile:

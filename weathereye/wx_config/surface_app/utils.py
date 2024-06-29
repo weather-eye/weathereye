@@ -1,5 +1,4 @@
 import os
-import getpass
 
 
 # path to ansible project folder
@@ -160,12 +159,17 @@ def write_out_host_connection_details(form, install_type):
 
 def process_form(form, install_type):
 
+    # read username from file
+    with open(os.path.join(project_dir, 'env', 'user'), 'r') as file_object:
+      # Read the entire file content into a string
+      username = file_object.read().strip()
+
     if install_type.install_type == "remote":
         # modify ansible cfg file with the root username
-        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), f'become_user={getpass.getuser()}', 'become_user=root')
+        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), f'become_user={username}', 'become_user=root')
     else:
         # modify ansible cfg file with the current username
-        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), 'become_user=root', f'become_user={getpass.getuser()}')
+        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), 'become_user=root', f'become_user={username}')
 
     write_out_host_connection_details(form, install_type)
 

@@ -1,6 +1,7 @@
 """Main module."""
 import os
 import site
+import getpass
 
 # Path to your virtual environment
 venv_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
@@ -40,6 +41,9 @@ webapp_project_path = os.path.join(os.path.dirname(__file__), 'wx_config')
 # retrieve and set SURFACE environment variables
 def wx_configuration(sudo_password):
     try:
+        # write out username to file
+        write_user_to_file(getpass.getuser(), os.path.join(webapp_project_path, 'ansible', 'surface_app', 'env', 'user'))
+
         # configure web app playbook to django webapp folder path
         with open(playbook_extravars, 'w') as extravars_file:
             extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
@@ -71,3 +75,8 @@ def wx_configuration(sudo_password):
         
         return False
     
+
+# write out current user to file for user by local installations
+def write_user_to_file(name, filename):
+  with open(filename, 'w') as file_object:
+    file_object.write(name)

@@ -42,6 +42,8 @@
         apt_repository:
           repo: deb https://download.docker.com/linux/ubuntu jammy stable
           state: present
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
 
       - name: Install docker-ce
         apt:
@@ -68,9 +70,10 @@
           state: absent
 
       - name: Clone SURFACE Repository
-        ansible.builtin.shell: git clone https://github.com/opencdms/surface.git
-        args:
-          chdir: "{{ surface_repo_path_dir }}"
+        ansible.builtin.git:
+          repo: https://github.com/opencdms/surface.git
+          dest: "{{ surface_repo_path }}"
+          force: true
 
       - name: Remove example SUFACE config file (production.env.example)
         ansible.builtin.file:

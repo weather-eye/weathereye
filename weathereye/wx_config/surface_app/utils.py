@@ -1,73 +1,46 @@
 import os
+import getpass
+
 
 # path to ansible project folder
-project_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ansible', 'surface_app',)
+django_app_dir = os.path.dirname(os.path.dirname(__file__))
+
+# path to ansible project folder
+project_dir = os.path.join(django_app_dir, 'ansible', 'surface_app',)
 
 # path to remote connection file
-connection_password_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ansible', 'surface_app', 'env', 'connection_password')
+connection_password_file_path = os.path.join(project_dir, 'env', 'connection_password')
 
 # path to root user password file
-sudo_password_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ansible', 'surface_app', 'env', 'become_password')
+sudo_password_file_path = os.path.join(project_dir, 'env', 'become_password')
 
 # path to sudo password used for local installs
-local_sudo_password_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),'wx_playbook', 'env', 'become_password')
+local_sudo_password_path = os.path.join(os.path.dirname(django_app_dir ),'wx_playbook', 'env', 'become_password')
 
 # path to surface variables file
-variable_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ansible', 'surface_app', 'env', 'extravars',)
+variable_file_path = os.path.join(project_dir, 'env', 'extravars',)
 
 # path to production.env file
-prod_env_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ansible', 'surface_app', 'env', 'production.env',)
+prod_env_file_path = os.path.join(project_dir, 'env', 'production.env',)
 
 # path to remote hosts path
-hosts_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ansible', 'surface_app', 'inventory', 'hosts')
+hosts_file_path = os.path.join(project_dir, 'inventory', 'hosts')
 
 
-def process_form(form, install_type):
-    # write out remote host connection details 
-    if install_type.install_type == 'remote':
-        
-        # Read the contents of the hosts file
-        with open(hosts_file_path, 'r') as file:
-            lines = file.readlines()
-
-        # Find the index of the [remote] section
-        remote_index = None
-        for index, line in enumerate(lines):
-            if line.strip() == '[remote]':
-                remote_index = index
-                break
-
-        # If the [remote] section is found, modify the content
-        if remote_index is not None:
-            # Keep everything before the [remote] section and add the new content
-            new_lines = lines[:remote_index + 1]
-            new_lines.append(f'\n{form.cleaned_data["host"].strip()}')
-
-            # Write the modified contents back to the file
-            with open(hosts_file_path, 'w') as file:
-                file.writelines(new_lines)
-
-        # write out remote connection password to the connection password file
-        with open(connection_password_file_path, 'w') as connection_password_file:
-            connection_password_file.write(form.cleaned_data["remote_connect_password"])
-
-        # write root password to the sudo password file
-        with open(sudo_password_file_path, 'w') as sudo_password_file:
-            sudo_password_file.write(form.cleaned_data["root_password"])
-
-    else:
-        # on local installs write out a misc value to the connection password file
-        with open(connection_password_file_path, 'w') as connection_password_file:
-            connection_password_file.write('connection_password')
-
-        # write root password to the sudo password file
-        with open(sudo_password_file_path, 'w') as sudo_password_file:
-            # path to where local sudo password is stored
-            with open(local_sudo_password_path, 'r') as local_sudo_password:
-                # write sudo password out
-                sudo_password_file.write(local_sudo_password.read())
+def replace_text_in_file(file_path, search_text, replace_text):
+    # Read the content of the file
+    with open(file_path, 'r') as file:
+        file_content = file.read()
+    
+    # Replace the search text with the replacement text
+    new_content = file_content.replace(search_text, replace_text)
+    
+    # Write the modified content back to the file
+    with open(file_path, 'w') as file:
+        file.write(new_content)
 
 
+def write_out_surface_variables(form):
     # write out surface variables
     with open(variable_file_path, 'w') as vf:
         vf.write('---\n')
@@ -77,9 +50,6 @@ def process_form(form, install_type):
             vf.write(f'"surface_repo_path": "{surface_repo_path}surface/"\n')
         else:
             vf.write(f'"surface_repo_path": "{surface_repo_path}/surface/"\n')
-
-        if install_type.install_type != 'remote':
-            vf.write(f'"surface_repo_path_dir": "{surface_repo_path}"\n')
 
         # write with_data
         vf.write(f'"with_data": "{form.cleaned_data["with_data"]}"\n')
@@ -96,6 +66,8 @@ def process_form(form, install_type):
         # path to production.env file
         vf.write(f'"prod_env_path": "{prod_env_file_path}"\n')
 
+
+def write_out_production_variables(form):
     # clear production.env of any previously entered settings
     with open(prod_env_file_path, 'r') as file:
         prod_lines = file.readlines()
@@ -135,7 +107,68 @@ def process_form(form, install_type):
         prod.write(f'SPATIAL_ANALYSIS_FINAL_LATITUDE={form.cleaned_data["spatial_analysis_final_latitude"]}\n')
         prod.write(f'SPATIAL_ANALYSIS_FINAL_LONGITUDE={form.cleaned_data["spatial_analysis_final_longitude"]}\n')
 
-    # After configuring SURFACE env variables begin the installation
+
+def write_out_host_connection_details(form, install_type):
+    # write out remote host connection details 
+    if install_type.install_type == 'remote':
+
+        # modify ansible cfg file with the root username
+        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), f'become_user={getpass.getuser()}', 'become_user=root')
+        
+        # Read the contents of the hosts file
+        with open(hosts_file_path, 'r') as file:
+            lines = file.readlines()
+
+        # Find the index of the [remote] section
+        remote_index = None
+        for index, line in enumerate(lines):
+            if line.strip() == '[remote]':
+                remote_index = index
+                break
+
+        # If the [remote] section is found, modify the content
+        if remote_index is not None:
+            # Keep everything before the [remote] section and add the new content
+            new_lines = lines[:remote_index + 1]
+            new_lines.append(f'\n{form.cleaned_data["host"].strip()}')
+
+            # Write the modified contents back to the file
+            with open(hosts_file_path, 'w') as file:
+                file.writelines(new_lines)
+
+        # write out remote connection password to the connection password file
+        with open(connection_password_file_path, 'w') as connection_password_file:
+            connection_password_file.write(form.cleaned_data["remote_connect_password"])
+
+        # write root password to the sudo password file
+        with open(sudo_password_file_path, 'w') as sudo_password_file:
+            sudo_password_file.write(form.cleaned_data["root_password"])
+
+    else:
+        # modify ansible cfg file with the current username
+        replace_text_in_file(os.path.join(project_dir, 'project', 'ansible.cfg'), 'become_user=root', f'become_user={getpass.getuser()}')
+
+        # on local installs write out a misc value to the connection password file
+        with open(connection_password_file_path, 'w') as connection_password_file:
+            connection_password_file.write('connection_password')
+
+        # write root password to the sudo password file
+        with open(sudo_password_file_path, 'w') as sudo_password_file:
+            # path to where local sudo password is stored
+            with open(local_sudo_password_path, 'r') as local_sudo_password:
+                # write sudo password out
+                sudo_password_file.write(local_sudo_password.read())
+
+
+def process_form(form, install_type):
+
+    write_out_host_connection_details(form, install_type)
+
+    write_out_surface_variables(form)
+
+    write_out_production_variables(form)
+
+    # set the required playbook file
     if install_type.install_type == 'remote':
         playbook_name = 'remote_install_surface.yml' # for remote installations
     else:

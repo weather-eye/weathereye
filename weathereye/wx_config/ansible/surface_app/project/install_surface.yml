@@ -27,36 +27,26 @@
             - git
             - python3-setuptools
           state: latest
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
 
       - name: Remove docker-ce
         apt:
           name: docker-ce
           state: absent
-        retries: 2
-        delay: 90 # Wait 1 minute 30 sec between retires
 
       - name: Add Docker GPG apt Key
         apt_key:
           url: https://download.docker.com/linux/ubuntu/gpg
           state: present
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
 
       - name: Add Docker Repository
         apt_repository:
           repo: deb https://download.docker.com/linux/ubuntu jammy stable
           state: present
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
 
       - name: Install docker-ce
         apt:
           name: docker-ce
           state: latest
-        retries: 2
-        delay: 60 # Wait 1 minute between retires
 
       - name: Install Docker Module for Python
         pip:
@@ -78,11 +68,9 @@
           state: absent
 
       - name: Clone SURFACE Repository
-        ansible.builtin.git:
-          repo: https://github.com/opencdms/surface.git
-          dest: "{{ surface_repo_path }}"
-          force: true
-        become: false
+        ansible.builtin.shell: git clone https://github.com/opencdms/surface.git
+        args:
+          chdir: "{{ surface_repo_path_dir }}"
 
       - name: Remove example SUFACE config file (production.env.example)
         ansible.builtin.file:

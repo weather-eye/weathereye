@@ -77,6 +77,10 @@ def process_form(form, install_type):
             vf.write(f'"surface_repo_path": "{surface_repo_path}surface/"\n')
         else:
             vf.write(f'"surface_repo_path": "{surface_repo_path}/surface/"\n')
+
+        if install_type.install_type != 'remote':
+            vf.write(f'"surface_repo_path_dir": "{surface_repo_path}"\n')
+
         # write with_data
         vf.write(f'"with_data": "{form.cleaned_data["with_data"]}"\n')
         # write data file path

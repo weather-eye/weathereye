@@ -112,10 +112,12 @@
                         outputElement.textContent = ""
                         let progress_count = 0
 
+                        // get event stdout
                         data.events.forEach(event => {
-                            outputElement.textContent += `${event.stdout}`;
-                            console.log(typeof(event.stdout));
-                            console.log(event.stdout);
+                            let outputText = `${event.stdout}`;
+                            let pattern = /\[(0|1)(;3[0-9])?m\]/g; // patterns to remove from the output text
+
+                            outputElement.textContent += outputText.replace(pattern, '');
                             progress_count += 1
                         });
 

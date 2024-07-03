@@ -46,6 +46,7 @@
       retries: 2
       delay: 60 # Wait 1 minute between retires
       when: ansible_distribution in ['Ubuntu']
+      ignore_errors: true
 
     - name: Install required packages (Ubuntu)
       apt:

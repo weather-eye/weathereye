@@ -115,7 +115,7 @@
                         // get event stdout
                         data.events.forEach(event => {
                             let outputText = `${event.stdout}`;
-                            let pattern = /\[(0|1)(;3[0-9])?m\]/g; // patterns to remove from the output text
+                            let pattern = /\[\d(;3\d)?m/g; // patterns to remove from the output text
 
                             // Debugging: log the original text and the cleaned text
                             console.log('Original text:', outputText);

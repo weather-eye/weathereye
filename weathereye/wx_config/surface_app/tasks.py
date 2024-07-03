@@ -40,10 +40,9 @@ def install_surface(self, project_dir, playbook_name, install_type):
         )
 
         # captures playbook return code and updates the task status accordingly
-        if playbook_run.rc == 0:
+        if playbook_run.status == 'successful':
             ansible_run.status = 'SUCCESS'
-            if install_type == "local":
-                click.launch("http://0.0.0.0:8080") # start surface on success
+            click.launch("http://0.0.0.0:8080") # start surface on success
         else:
             ansible_run.status = 'FAILURE'
 

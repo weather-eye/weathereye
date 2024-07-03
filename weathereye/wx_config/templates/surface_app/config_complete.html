@@ -113,12 +113,9 @@
                         let progress_count = 0
 
                         data.events.forEach(event => {
-                            var pattern = /\[(0|1)(;3[0-9])?m\]/g;
-                            test_text = `${event.stdout}`;
-
-                            console.log("this is test_text: " + test_text);
-
-                            outputElement.textContent += test_text.replace(pattern, '');
+                            outputElement.textContent += `${event.stdout}`;
+                            console.log(typeof(event.stdout));
+                            console.log(event.stdout);
                             progress_count += 1
                         });
 

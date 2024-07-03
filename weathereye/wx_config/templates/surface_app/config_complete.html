@@ -92,16 +92,6 @@
         var check_hang = false;
 
         setTimeout(() => {check_hang = true;}, 2 * 60 * 1000); // 2 minutes delay
-
-        // clear up envent output text
-        function removePatterns(text_string) 
-        {
-            var text = text_string;
-            // This regular expression matches patterns like [0m and [0;30m to [0;40m
-            const pattern = /\[(0|1)(;3[0-9])?m\]/g;
-            // Replace the matching patterns with an empty string
-            return text.replace(pattern, '');
-        }
   
         // get task status
         function pollTaskStatus(taskId) {
@@ -123,7 +113,12 @@
                         let progress_count = 0
 
                         data.events.forEach(event => {
-                            outputElement.textContent += removePatterns(`${event.stdout}`);
+                            var pattern = /\[(0|1)(;3[0-9])?m\]/g;
+                            test_text = `${event.stdout}`;
+
+                            console.log("this is test_text: " + test_text);
+
+                            outputElement.textContent += test_text.replace(pattern, '');
                             progress_count += 1
                         });
 

@@ -31,11 +31,18 @@ Linux
 Install
 -------
 
-Ensure that pip is installed.
+Update and Upgrade Packages
 
 .. code-block::
 
-    sudo apt install pip
+    sudo apt update
+    sudo apt upgrade
+
+Ensure that PIPX is installed.
+
+.. code-block::
+
+    sudo apt install pipx
 
 To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
 
@@ -64,22 +71,13 @@ Currently, the weathereye command line tool is limited to:
 
 * ``wx --help`` - List available available commands
 
-* ``wx venv`` - Ensure you run this command before installing anything with weathereye
-
-* ``wx install surface`` - Install SURFACE CDMS
-
-* ``wx install surface --remote`` - Install SURFACE CDMS on a remote machine
+* ``wx install`` - Launches a web application to select which ``weathereye`` related app to install and configure environment variables
 
 
 Usage
 -----
 
-1. **Before running any commands, activate the weathereye virtual environment created by pipx:**
-
-* Activate the environment: 
-   ``wx venv``
-
-2. **Enable SSH connections for remote machines:**
+1. **Enable SSH connections for remote machines:**
 
 * To download SURFACE on remote machines, ensure that the remote machines can be accessed via SSH.
 

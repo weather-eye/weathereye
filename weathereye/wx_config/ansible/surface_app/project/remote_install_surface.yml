@@ -1,0 +1,183 @@
+---
+- name: Install SURFACE
+  hosts: remote
+  become: true # granting root privileges
+
+  tasks: 
+      - name: Check Supported Systems
+        ansible.builtin.fail:
+          msg: The remote machine's system is currently not supported. See docs.weathereye.org for supported operating systems and distributions.
+        when: ansible_facts['distribution'] != "Ubuntu" or ansible_facts['distribution_version'] != "22.04"
+     
+      - name: Update apt cache
+        apt:
+          update_cache: true
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Install required system packages
+        apt:
+          pkg:
+            - apt-transport-https
+            - ca-certificates
+            - curl
+            - software-properties-common
+            - python3-pip
+            - virtualenv
+            - git
+            - python3-setuptools
+          state: latest
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Remove docker-ce
+        apt:
+          name: docker-ce
+          state: absent
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Add Docker GPG apt Key
+        apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Add Docker Repository
+        apt_repository:
+          repo: deb https://download.docker.com/linux/ubuntu jammy stable
+          state: present
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Install docker-ce
+        apt:
+          name: docker-ce
+          state: latest
+        retries: 2
+        delay: 60 # Wait 1 minute between retires
+
+      - name: Install Docker Module for Python
+        pip:
+          name: docker
+
+      - name: Tear down existing Docker services (if any) remove orphans and volumes
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path }}"
+          build: never
+          state: absent
+          remove_images: all
+          remove_orphans: true
+          remove_volumes: true
+        ignore_errors: true
+
+      - name: Remove old SUFACE directory clones
+        ansible.builtin.file:
+          path: "{{ surface_repo_path }}"
+          state: absent
+
+      - name: Clone SURFACE Repository
+        ansible.builtin.git:
+          repo: https://github.com/opencdms/surface.git
+          dest: "{{ surface_repo_path }}"
+          force: true
+        become: false
+
+      - name: Remove example SUFACE config file (production.env.example)
+        ansible.builtin.file:
+          path: "{{ surface_repo_path }}api/production.env.example"
+          state: absent
+
+      - name: Add SURFACE config file (production.env)
+        ansible.builtin.copy:
+          src: "{{ prod_env_path }}"
+          dest: "{{ surface_repo_path }}api/"
+        become: false
+
+      - name: Ensure pip version is less than 24.1 in Dockerfile
+        ansible.builtin.lineinfile:
+          path: "{{ surface_repo_path }}api/Dockerfile"
+          regexp: '^RUN pip install -U pip setuptools wheel$'
+          line: 'RUN pip install -U "pip<24.1" setuptools wheel'
+
+      - name: Ensure --force-reinstall flag is added to numpy installation in Dockerfile
+        lineinfile:
+          path: "{{ surface_repo_path }}api/Dockerfile"
+          regexp: '^RUN pip install numpy==1.21.2$'
+          line: 'RUN pip install numpy==1.21.2 --force-reinstall'
+
+      - name: Ensure numpy is added to the end of requirements.txt
+        lineinfile:
+          path: "{{ surface_repo_path }}api/requirements.txt"
+          line: 'numpy==1.21.2'
+          insertafter: EOF
+
+      - name: Creating and starting Docker services (This may take a while...)
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path }}"
+          build: always
+          state: present
+          services:
+            - postgres
+            - cache
+            - redis
+            - api
+
+      # - name: Build docker images (This may take a while...)
+      #   ansible.builtin.shell: docker compose build
+      #   args:
+      #     chdir: "{{ surface_repo_path }}"
+
+      # - name: Start containers - POSTGRES CACHE REDIS API (This may take a while...)
+      #   ansible.builtin.shell: docker compose up postgres cache redis api
+      #   args:
+      #     chdir: "{{ surface_repo_path }}"
+
+      - name: Start Without Data (This may take a while...)
+        ansible.builtin.shell: docker compose exec api bash load_initial_data.sh
+        args:
+          chdir: "{{ surface_repo_path }}"
+        when: with_data in ['no', 'No', 'NO']
+
+      - name: Copy Data file to remote machine
+        ansible.builtin.copy:
+          src: "{{ data_path }}"
+          dest: "{{ surface_repo_path }}"
+        when: with_data in ['yes', 'Yes', 'YES']
+        become: false
+
+      - name: Start With Data (This may take a while...)
+        ansible.builtin.shell: docker compose exec -T postgres psql -U dba -d surface_db < "{{ surface_repo_path  }}/{{ data_file_name }}"
+        args:
+          chdir: "{{ surface_repo_path }}"
+        when: with_data in ['yes', 'Yes', 'YES']
+
+      # - name: Remove data file
+      #   ansible.builtin.file:
+      #     path:
+      #     state:
+
+      - name: Collect Static Files
+        ansible.builtin.shell: docker compose exec api python manage.py collectstatic --noinput
+        args:
+          chdir: "{{ surface_repo_path }}"
+
+      - name: Create Admin User
+        ansible.builtin.shell: docker compose exec api sh -c "export DJANGO_SUPERUSER_USERNAME='{{ admin }}' && export DJANGO_SUPERUSER_EMAIL='{{ admin_email }}' && export DJANGO_SUPERUSER_PASSWORD='{{ admin_password }}' && python manage.py createsuperuser --noinput"
+        args:
+          chdir: "{{ surface_repo_path }}"
+
+      - name: Stopping all containers
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path }}"
+          state: stopped
+
+      - name: Starting up SURFACE
+        community.docker.docker_compose_v2:
+          project_src: "{{ surface_repo_path }}"
+          state: present
+
+      - name: SURFACE installation complete!
+        ansible.builtin.pause:
+          seconds: 2

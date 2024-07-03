@@ -1,37 +1,66 @@
 """Main module."""
 import os
+import site
+import getpass
+
+# Path to your virtual environment
+venv_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+
+# Path to venv activation script
+venv_activate = os.path.join(venv_path, 'bin', 'activate')
+
+# Set the VIRTUAL_ENV environment variable
+os.environ['VIRTUAL_ENV'] = venv_path
+
+# Add the virtual environment's site-packages to sys.path
+site_packages = os.path.join(venv_path, 'lib', 'python3.10', 'site-packages')
+site.addsitedir(site_packages)
+
+# Add the virtual environment's bin directory to the PATH environment variable
+bin_path = os.path.join(venv_path, 'bin')
+os.environ['PATH'] = bin_path + os.pathsep + os.environ.get('PATH', '')
+
+
 import click
 import ansible_runner
 
 
-# path containing playbooks and settings files
-playbooks_path = os.path.join(os.path.dirname(__file__), 'playbooks')
-# path to SURFACE configuration webapp project folder
-webapp_project_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'project', 'wx_django',)
-# code to activate weathereye venv
-activate_venv = "source " + os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'bin', 'activate')
-# progress file path
-progress_file_path = os.path.join(os.path.dirname(__file__), 'playbooks', 'project', 'wx_django', 'static', 'misc', 'progress')
+# path containing wx configuration playbook
+wx_playbook_path = os.path.join(os.path.dirname(__file__), 'wx_playbook')
+
+# path to sudo password to start django playbook
+sudo_password_path = os.path.join(wx_playbook_path, 'env', 'become_password')
+
+# extra variables file for wx configuration webapp playbook
+playbook_extravars = os.path.join(wx_playbook_path, 'env', 'extravars')
+
+# path to wx configuration webapp project folder
+webapp_project_path = os.path.join(os.path.dirname(__file__), 'wx_config')
 
 
 # retrieve and set SURFACE environment variables
-def configure_surface(ansible_extravars):
-    # configure web app playbook to django webapp folder path
-    with open(ansible_extravars, 'a') as extravars_file:
-            extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
-
+def wx_configuration(sudo_password):
     try:
-        # start web app to configure SURFACE environment variables
-        playbook_result = ansible_runner.run(private_data_dir=playbooks_path, 
-                                             playbook='config_webapp.yml',)
+        # write out username to file
+        write_user_to_file(getpass.getuser(), os.path.join(webapp_project_path, 'ansible', 'surface_app', 'env', 'user'))
+
+        # configure web app playbook to django webapp folder path
+        with open(playbook_extravars, 'w') as extravars_file:
+            extravars_file.write(f'\ndjango_webapp_path: {webapp_project_path}')
+            extravars_file.write(f'\nvenv_path: {venv_path}')
+            extravars_file.write(f'\nvenv_activate: {venv_activate}')
+
+        # sudo password required for django web app playbook executeion
+        with open(sudo_password_path, 'w') as sudo_password_file:
+            sudo_password_file.write(sudo_password)
+
+        # start web app to configure and install wx apps
+        playbook_result = ansible_runner.run(private_data_dir=wx_playbook_path, 
+                                             playbook='wx_configuration.yml',)
 
         if playbook_result.status == "successful":
             click.launch("http://localhost:52376/")
         else:
-            # update the progress file with a fail code
-            with open(progress_file_path, 'a') as pf:
-                pf.write('x')
-
             click.echo(click.style("\nAn error occured while configuring SURFACE environment variables .", fg='red'))
             click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
 
@@ -40,10 +69,6 @@ def configure_surface(ansible_extravars):
         return True
 
     except Exception as error:
-        # update the progress file with a fail code
-        with open(progress_file_path, 'a') as pf:
-            pf.write('x')    
-
         click.echo(click.style("An error occured during SURFACE installation.", fg='red'))
         click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
         click.echo(f"{error}", err=True)
@@ -51,81 +76,7 @@ def configure_surface(ansible_extravars):
         return False
     
 
-# execute SURFACE playbook
-def install_surface():
-    try:
-        # install SURFACE
-        playbook_result = ansible_runner.run(private_data_dir=playbooks_path, 
-                                             playbook='install_surface.yml',)
-
-        if playbook_result.status == "successful":
-            # update the progress file with a success code
-            with open(progress_file_path, 'a') as pf:
-                pf.write('s')
-
-            click.launch("http://0.0.0.0:8080")
-
-            click.echo(click.style("\nSURFACE successfully installed locally!", fg='green', bold=True))
-            click.echo(click.style("\nYou can access surface at http://0.0.0.0:8080", fg='green', bold=True))
-        else:
-            # update the progress file with a fail code
-            with open(progress_file_path, 'a') as pf:
-                pf.write('x')
-
-            click.echo(click.style("\nAn error occured during SURFACE installation.", fg='red'))
-            click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
-
-            return False
-
-        return True
-
-    except Exception as error:
-        # update the progress file with a fail code
-        with open(progress_file_path, 'a') as pf:
-            pf.write('x')
-
-        click.echo(click.style("An error occured during SURFACE installation.", fg='red'))
-        click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
-        click.echo(f"{error}", err=True)
-        
-        return False
-    
-
-# execute SURFACE playbook on remote machines
-def remote_install_surface():
-    try:
-        # install SURFACE on a remote machine
-        playbook_result = ansible_runner.run(private_data_dir=playbooks_path, 
-                                             playbook='remote_install_surface.yml',)
-
-        if playbook_result.status == "successful":
-            # update the progress file with a success code
-            with open(progress_file_path, 'a') as pf:
-                pf.write('s')
-
-            click.launch("http://0.0.0.0:8080")
-
-            click.echo(click.style("\nSURFACE successfully installed!", fg='green', bold=True))
-            click.echo(click.style("\nYou can access surface at http://0.0.0.0:8080 on the remote machine", fg='green', bold=True))
-        else:
-            # update the progress file with a fail code
-            with open(progress_file_path, 'a') as pf:
-                pf.write('x')
-
-            click.echo(click.style("\nAn error occured during SURFACE installation.", fg='red'))
-            click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
-
-            return False
-
-        return True
-
-    except Exception as error:
-        # update the progress file with a fail code
-        with open(progress_file_path, 'a') as pf:
-            pf.write('x')
-
-        click.echo(click.style("\nAn error occured during SURFACE installation.", fg='red'))
-        click.echo(click.style("see docs.weathereye.org for project documentation.", fg='red'))
-        click.echo(f"{error}", err=True)
-    
-        return False
+# write out current user to file for user by local installations
+def write_user_to_file(name, filename):
+  with open(filename, 'w') as file_object:
+    file_object.write(name)

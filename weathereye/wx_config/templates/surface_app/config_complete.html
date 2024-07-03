@@ -117,10 +117,6 @@
                             let outputText = `${event.stdout}`;
                             let pattern = /\[\d(;3\d)?m/g; // patterns to remove from the output text
 
-                            // Debugging: log the original text and the cleaned text
-                            console.log('Original text:', outputText);
-                            console.log('Cleaned text:', outputText.replace(pattern, ''));
-
                             outputElement.textContent += outputText.replace(pattern, '');
                             progress_count += 1
                         });

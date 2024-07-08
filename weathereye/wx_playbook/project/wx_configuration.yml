@@ -38,6 +38,7 @@
         state: present
         update_homebrew: true
       when: ansible_distribution in ['MacOSX']
+      become: false
 
   # downloading redis and pip on ubuntu machines
     - name: Update apt cache
@@ -62,8 +63,8 @@
       async: 10800
       poll: 0
   
-  # run database migrations
-    - name: Make migrations
+  # run database migrations and collectstatic Files
+    - name: Make migrations and collectstatic files
       community.general.django_manage:
         command: resetdb
         project_path: "{{ django_webapp_path }}"

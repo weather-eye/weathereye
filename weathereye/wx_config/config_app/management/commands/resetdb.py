@@ -43,4 +43,4 @@ class Command(BaseCommand):
         os.system('python3 manage.py migrate')
         # Collect static files
         self.stdout.write('Collecting Static files...')
-        os.system('python3 manage.py collectstatic --noinput --clear')
+        os.system('python3 manage.py collectstatic --noinput')

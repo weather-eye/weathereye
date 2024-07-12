@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <link rel="icon" type="image/png" href="{% static 'surface_app/images/circle_logo_small.png' %}">
+  <link rel="stylesheet" href="{% static 'surface_app/css/style.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+  <title>Configure SURFACE Environment Variables</title>
+
+  <style>
+    /* loading function */
+    .loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+    }
+
+    #loader {
+        border: 8px solid #f3f3f3; /* Light grey */
+        border-top: 8px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 80px; /* Larger width */
+        height: 80px; /* Larger height */
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loader-container" id="loader-container">
+    <div id="loader"></div>
+  </div>
+
+  <div id="content" class="hide">
+    <!-- Home button -->
+    <a href="{% url 'wx_configuration' %}" id="home-button" class="btn-primary"><i class="fas fa-home"></i></a>
+
+    <!-- Scroll to top button -->
+    <button onclick="scrollToBottom()" class="scroll-btn">
+      <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="logo"></div>
+    
+    <section>
+      <div class="tab-container">
+        <div class="tab-center">
+          <button class="tablinks" id="defaultOpen">Installation Details</button>
+          <button class="tablinks">Surface Admin</button>
+          <button class="tablinks">LRGS Details</button>
+          <button class="tablinks">Map Details</button>
+          <button class="tablinks">Spatial Analysis Details</button>
+          <button class="tablinks">Summary</button>
+        </div>
+      </div>
+      
+      <form method="post">
+        {% csrf_token %}
+
+        <div id="tab0" class="tabcontent">
+          <div class="form-group">
+            {% if install_type == 'remote' %}
+              <label for="{{ form.host.id_for_label }}"><span class="required"></span>{{ form.host.label }}</label>
+              {{ form.host }}
+
+              <label for="{{ form.remote_connect_password.id_for_label }}"><span class="required"></span>{{ form.remote_connect_password.label }}</label>
+              <div class="password-field">
+                {{ form.remote_connect_password }}
+                <span class="password-toggle-icon"><i class="fas fa-eye"> Show Password</i></span>
+              </div>
+
+              <label for="{{ form.root_password.id_for_label }}"><span class="required"></span>{{ form.root_password.label }}</label>
+              <div class="password-field">
+                {{ form.root_password }}
+                <span class="password-toggle-icon"><i class="fas fa-eye"> Show Password</i></span>
+              </div>
+            {% endif %}
+
+            <label for="{{ form.surface_repo_path.id_for_label }}"><span class="required"></span>{{ form.surface_repo_path.label }}</label>
+            {{ form.surface_repo_path }}
+
+            <label>{{ form.with_data.label }}</label>
+            {{ form.with_data }}
+          
+            <div class="form-group" id="backup-data-path" style="display:none;">
+              <label for="{{ form.data_path.id_for_label }}"><span class="required"></span>{{ form.data_path.label }}</label>
+              {{ form.data_path }}
+            </div>
+          </div>
+        </div>
+        
+        <div id="tab1" class="tabcontent">
+          <div class="form-group">
+            <label for="{{ form.admin.id_for_label }}"><span class="required"></span>{{ form.admin.label }}</label>
+            {{ form.admin }}
+
+            <label for="{{ form.admin_password.id_for_label }}"><span class="required"></span>{{ form.admin_password.label }}</label>
+            <div class="password-field">
+              {{ form.admin_password }} 
+              <span class="password-toggle-icon"><i class="fas fa-eye"> Show Password</i></span>
+            </div>
+            
+            <label for="{{ form.admin_email.id_for_label }}"><span class="required"></span>{{ form.admin_email.label }}</label>
+            {{ form.admin_email }}
+          </div>
+        </div>
+
+        <div id="tab2" class="tabcontent">
+          <div class="form-group">
+            <label for="{{ form.lrgs_user.id_for_label }}"><span class="required"></span>{{ form.lrgs_user.label }}</label>
+            {{ form.lrgs_user }}
+
+            <label for="{{ form.lrgs_password.id_for_label }}"><span class="required"></span>{{ form.lrgs_password.label }}</label>
+            <div class="password-field">
+              {{ form.lrgs_password }}
+              <span class="password-toggle-icon"><i class="fas fa-eye"> Show Password</i></span>
+            </div>
+
+            <label for="{{ form.timezone_name.id_for_label }}"><span class="required"></span>{{ form.timezone_name.label }}</label>
+            {{ form.timezone_name }}
+
+            <label for="{{ form.timezone_offset.id_for_label }}"><span class="required"></span>{{ form.timezone_offset.label }}</label>
+            {{ form.timezone_offset }}
+          </div>
+        </div>
+
+        <div id="tab3" class="tabcontent">
+          <label style="font-size: 20px;">Select your country's coordinates and zoom on the map</label>
+
+          <div id="initial-map"></div>
+          
+          <div class="form-group">
+            <label for="{{ form.map_latitude.id_for_label }}"><span class="required"></span>{{ form.map_latitude.label }}</label>
+            {{ form.map_latitude }}
+
+            <label for="{{ form.map_longitude.id_for_label }}"><span class="required"></span>{{ form.map_longitude.label }}</label>
+            {{ form.map_longitude }}
+
+            <label for="{{ form.map_zoom.id_for_label }}"><span class="required"></span>{{ form.map_zoom.label }} (between 0 - 15)</label>
+            {{ form.map_zoom }}
+          </div>
+        </div>
+
+        <div id="tab4" class="tabcontent">
+          <label style="font-size: 20px;">Select your country's spatial analysis range</label>
+
+          <p>Click the square icon to draw your country's spatial analysis range.</p>
+          
+          <div id="spatial-map"></div>
+
+          <div class="form-group">
+            <label for="{{ form.spatial_analysis_initial_latitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_initial_latitude.label }}</label>
+            {{ form.spatial_analysis_initial_latitude }}
+
+            <label for="{{ form.spatial_analysis_initial_longitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_initial_longitude.label }}</label>
+            {{ form.spatial_analysis_initial_longitude }}
+
+            <label for="{{ form.spatial_analysis_final_latitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_final_latitude.label }}</label>
+            {{ form.spatial_analysis_final_latitude }}
+
+            <label for="{{ form.spatial_analysis_final_longitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_final_longitude.label }}</label>
+            {{ form.spatial_analysis_final_longitude }}
+          </div>
+        </div>
+
+        <div id="tab5" class="tabcontent">
+          <p class="dark-text">If satisfied with the configuration settings, click the 'Save Configuration' button to proceed.</p>
+
+          <div class="summary-container">
+            {% if install_type == 'remote'  %}
+              <div class="summary-item">
+                <label for="{{ form.host.id_for_label }}"><span class="required"></span>{{ form.host.label }}</label>
+                <input type="text" id="summary1" class="summary-input" value="" disabled>
+              </div>
+              
+              <div class="summary-item">
+                <label for="{{ form.remote_connect_password.id_for_label }}"><span class="required"></span>{{ form.remote_connect_password.label }}</label>
+                <input type="text" id="summary2" class="summary-input" value="" disabled>
+              </div>
+
+              <div class="summary-item">
+                <label for="{{ form.root_password.id_for_label }}"><span class="required"></span>{{ form.root_password.label }}</label>
+                <input type="text" id="summary3" class="summary-input" value="" disabled>
+              </div>
+            {% endif %}
+
+            <div class="summary-item">
+              <label for="{{ form.surface_repo_path.id_for_label }}"><span class="required"></span>{{ form.surface_repo_path.label }}</label>
+              <input type="text" id="summary4" class="summary-input" value="" disabled>
+            </div>
+            
+            <div class="summary-item">
+              <label for="{{ form.data_path.id_for_label }}">{{ form.data_path.label }}</label>
+              <input type="text" id="summary5" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.admin.id_for_label }}"><span class="required"></span>{{ form.admin.label }}</label>
+              <input type="text" id="summary6" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.admin_password.id_for_label }}"><span class="required"></span>{{ form.admin_password.label }}</label>
+              <input type="text" id="summary7" class="summary-input" value="" disabled>
+            </div>
+            
+            <div class="summary-item">
+              <label for="{{ form.admin_email.id_for_label }}"><span class="required"></span>{{ form.admin_email.label }}</label>
+              <input type="text" id="summary8" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.map_latitude.id_for_label }}"><span class="required"></span>{{ form.map_latitude.label }}</label>
+              <input type="text" id="summary9" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.map_longitude.id_for_label }}"><span class="required"></span>{{ form.map_longitude.label }}</label>
+              <input type="text" id="summary10" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.map_zoom.id_for_label }}"><span class="required"></span>{{ form.map_zoom.label }}</label>
+              <input type="text" id="summary11" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.spatial_analysis_initial_latitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_initial_latitude.label }}</label>
+              <input type="text" id="summary12" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.spatial_analysis_initial_longitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_initial_longitude.label }}</label>
+              <input type="text" id="summary13" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.spatial_analysis_final_latitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_final_latitude.label }}</label>
+              <input type="text" id="summary14" class="summary-input" value="" disabled>
+            </div>
+
+            <div class="summary-item">
+              <label for="{{ form.spatial_analysis_final_longitude.id_for_label }}"><span class="required"></span>{{ form.spatial_analysis_final_longitude.label }}</label>
+              <input type="text" id="summary15" class="summary-input" value="" disabled>
+            </div>
+
+          </div>
+
+          <p>Note: The form will not allow you to submit unless all required information is entered. Fields beginning with <span class="required"></span> are required and must be filled out!</p>
+        </div>
+
+        <div id="next-continue-btn" class="btn-continue">
+          <button type="button" class="btn btn-primary btn-back" onclick="prevTab()">Back</button>
+          <button type="button" class="btn btn-primary btn-continue" onclick="nextTab()">Continue</button>
+          <button type="submit" id="submitBtn" class="btn btn-submit">Save Configuration</button>
+        </div>
+      </form>
+
+    </section>
+
+    <!-- Scroll to button button -->
+    <button onclick="scrollToTop()" class="scroll-btn scroll-btn-top">
+      <i class="fas fa-chevron-up"></i>
+    </button>
+  </div>
+
+  <script type="text/javascript">
+    // Automatically populate surface_repo_path with users home directory only on local installs
+    "{% if install_type != 'remote'  %}"
+      document.querySelector('[name="surface_repo_path"]').value = "{{ user_home_dir }}";
+    "{% endif %}"
+
+    // Async function to handle the loading and displaying of content
+    async function handleLoading() {
+      var loaderContainer = document.getElementById('loader-container');
+      var loader = document.getElementById('loader');
+      var content = document.getElementById('content');
+
+      // Wait for an additional 1 seconds before displaying the content
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Remove 'hide' class from content to display it
+      content.classList.remove('hide');
+      // Hide loader by adding 'hide' class back
+      loaderContainer.classList.add('hide');
+      loaderContainer.classList.remove('loader-container');
+    }
+
+    // Wait for the DOM content to fully load
+    document.addEventListener('DOMContentLoaded', handleLoading);
+  </script>
+
+  <!-- Including js file -->
+  <script src="{% static 'surface_app/js/script.js' %}"></script>
+
+</body>
+</html>

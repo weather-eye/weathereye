@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="icon" type="image/png" href="{% static 'config_app/images/favicon-32x32.png' %}">
+    <link rel="stylesheet" href="{% static 'config_app/css/style.css' %}">
+
+    <title>Weathereye</title>
+
+    <style>
+        body {
+            background: url("{% static 'config_app/images/bg-2.jpg' %}") no-repeat center center fixed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title"><h1>WEATHEREYE Apps</h1></div>
+        <div class="card-container">
+
+            <!-- WIS2BOX -->
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <button class="main-button w2b-button">WIS2BOX</button>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="option-container">
+                            <div class="option-heading-wis2box">WIS2BOX</div>
+                            <a href="#" class="option unavailable">Remote Install</a>
+                            <a href="#" class="option unavailable">Local Install</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SURFACE -->
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <button class="main-button surface-button">SURFACE</button>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="option-container">
+                            <div class="option-heading-surface">SURFACE</div>
+                            {% if allow_surface_install %}
+
+                                <form id="installTypeForm" method="post">
+                                    {% csrf_token %}
+                                    {% for radio in surface_form.install_type %}
+                                        {% if not forloop.first %}
+                                            <span style="display: none;">{{ radio.tag }}</span>
+                                            <label class="option" for="{{ radio.id_for_label }}">{{ radio.choice_label }} Install</label>
+                                        {% endif %}
+                                    {% endfor %}
+                                </form>
+
+                            {% else %}
+
+                                <div>
+                                    <p>Installation in progress...</p>
+                                </div>
+
+                                <div class="view-progress">
+                                    <a href="{% url 'config-complete' task_id=surface_task_id %}" class="btn btn-progress">View Progress</a>
+                                </div>
+
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPENCDMS -->
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <button class="main-button opencdms-button">OPENCDMS</button>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="option-container">
+                            <div class="option-heading-opencdms">OPENCDMS</div>
+                            <a href="#" class="option unavailable">Remote Install</a>
+                            <a href="#" class="option unavailable">Local Install</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PORTAL -->
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <button class="main-button portal-button">PORTAL</button>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="option-container">
+                            <div class="option-heading-portal">PORTAL</div>
+                            <a href="#" class="option unavailable">Remote Install</a>
+                            <a href="#" class="option unavailable">Local Install</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="credit">
+        <a href="https://www.vecteezy.com/free-vector/globe-grid" target="_blank" rel="noopener noreferrer">Globe Grid Vectors by Vecteezy</a>
+    </div>   
+
+<!-- Including js file -->
+<script src="{% static 'config_app/js/script.js' %}"></script>
+
+</body>
+</html>

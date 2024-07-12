@@ -1,0 +1,431 @@
+body {
+  font-family: "Helvetica", "Arial", sans-serif;
+  margin: 3rem;
+  background-color: #f4f4f4;
+  color: #666;
+}
+  
+  .btn-center {
+    display: flex;
+    justify-content: center;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 0px 10px;
+    text-decoration: none;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  .dark-text {
+    color: #515151;
+    font-weight: bold;
+  }
+
+  .button-grey {
+    background-color: #949494;
+  }
+
+  .button-grey:hover {
+    background-color: #757575;
+  }
+
+  .button-green {
+    background-color: #28a745;
+  }
+
+  .button-green:hover {
+    background-color: #198754;
+  }
+
+  .button-red {
+    background-color: #dc3545;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+
+  .button-red:hover {
+    background-color: #bb2b3a;
+    transform: scale(1.05);
+  }
+
+  .button-orange {
+    background-color: #F7813E;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+
+  .button-orange:hover {
+    background-color: #E06C2E;
+    transform: scale(1.05);
+  }
+
+  .shutdown-h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: #dc3545;
+  }
+
+  .shutdown-p {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+
+  .success-h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #1e90ff;
+  }
+  
+  .success-p {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: #666;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #666;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    margin-top: 0rem;
+  }
+
+  h3 {
+    text-align: center;
+    color: #666;
+  }
+  
+  section {
+    border-radius: 1px;
+    border: 1px solid #ddd;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.209);
+  }
+  
+  .logo {
+    background-image: url(../images/logo.png);
+    position: relative;
+    width: 100%;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    padding-right: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #515151;
+  }
+
+  .password-field {
+    margin-bottom: 1.8rem;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.2s ease-in-out;
+  }
+  
+  .form-control:focus {
+    border-color: #1E90FF;
+    outline: none;
+    box-shadow: 0 0 5px rgba(30, 144, 255, 0.2);
+  }
+  
+  .btn-primary {
+    background-color: #1E90FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1C86EE;
+    transform: scale(1.05);
+  }
+  
+  .btn-primary:active {
+    background-color: #1874CD;
+    transform: scale(1);
+  }
+
+  .btn-submit {
+    background-color: #4ccb3d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+  
+  .btn-submit:hover {
+    background-color: #38a02c;
+    transform: scale(1.05);
+  }
+  
+  .btn-submit:active {
+    background-color: #30b022;
+    transform: scale(1);
+  }
+
+  .tab-container {
+    overflow-x: auto;
+  }
+  
+  .tab-center {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .tablinks {
+    background-color: #ffffff;
+    border: none;
+    color: #666;
+    padding: 10px 0;
+    text-align: center;
+    text-decoration: none;
+    flex-grow: 1;
+    font-size: 16px;
+    /* cursor: pointer; */
+    border-bottom: 2px solid transparent;
+  }
+  
+  .tablinks:hover {
+    background-color: #f7f7f7;
+  }
+  
+  .tablinks.active {
+    color: #1E90FF;
+    border-bottom: 2px solid #1E90FF;
+  }
+
+  .tablinks.active:hover {
+    background-color: #1e8fff19;
+  }
+  
+  .tabcontent {
+    padding: 20px;
+  }
+  
+  .tabcontent h3 {
+    margin-top: 0;
+  }
+
+  /* map styles */
+  #initial-map { 
+    height: 55vh; 
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  #spatial-map { 
+    height: 55vh; 
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Style for home buttons */
+  #home-button {
+    position: absolute;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    top: 20px;
+    left: 20px;
+  }
+
+
+  /* Style for scroll buttons */
+  .scroll-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    color: #555;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+
+  .scroll-btn:hover {
+    background-color: #f5f5f5;
+  }
+
+  .scroll-btn:focus {
+    outline: none;
+  }
+
+  /* Style for left and right arrow buttons */
+  .scroll-btn i {
+    line-height: 40px;
+  }
+
+  .scroll-btn-top {
+    bottom: auto;
+    top: 20px;
+  }
+
+  /* Style for disabled form fields */
+  .disabled-field {
+    pointer-events: none; /* Disable pointer events */
+    background-color: #f0f0f0; /* Add a different background color to visually indicate disabled state */
+    color: #999; /* Change text color to a lighter shade */
+  }
+
+  /* Add style for the red asterisk */
+  .required::before {
+    content: '*';
+    color: red;
+    margin-right: 4px;
+  }
+
+  /* Progress bar css */
+  #progress-container {
+    width: 100%;
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    margin: 20px 0;
+    border-radius: 20px;
+  }
+  #progress-bar {
+      width: 0;
+      height: 30px;
+      background-color: #4caf50;
+      text-align: center;
+      line-height: 30px;
+      color: white;
+      border-radius: 20px;
+  }
+  #status {
+      margin-top: 20px;
+  }
+
+  /* Password eye icon */
+  .password-toggle-icon {
+    /* position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%); */
+    cursor: pointer;
+  }
+  
+  .password-toggle-icon i {
+    font-size: 15px;
+    line-height: 1;
+    color: #666666;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .password-toggle-icon i:hover {
+    color: #3b3b3b;
+  }
+
+  /* Style for next buttons */
+  .next-btn {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .btn-continue {
+    display: flex;
+    justify-content: right;
+  }
+
+  /* hide class */
+  .hide {
+    display: none;
+  }
+
+  /* summary page styling */
+  .summary-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 50px 0px;
+  }
+
+  div.summary-container label {
+    font-weight: normal;
+    font-size: small;
+    color: #a9a9a9;    
+  }
+
+  div.summary-container input {
+    color: #8d8d8d;    
+  }
+
+  .summary-item {
+    flex: 0 1 45%;
+    box-sizing: border-box;
+    margin: 10px;
+  }
+
+  .summary-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px dashed #ccc;
+    padding: 5px 0;
+    background-color: transparent;
+    color: #333;
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* terminal installation output */
+  .output-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #output {
+    padding: 0px 20px;
+    border: 1px solid #ccc;
+    letter-spacing: 3px;
+    border-radius: 10px;
+    line-height: 2.5;
+    max-height: 45vh;
+    overflow: auto; /* Enables both vertical and horizontal scrolling */
+    font-family: monospace; /* Sets a monospace font for code display */
+    white-space: pre-wrap; /* Wraps long lines without breaking words */
+  }
+
+  .dark-mode {
+    background-color: black;
+    color: white;
+  }

@@ -38,31 +38,25 @@ Update and Upgrade Packages
     sudo apt update
     sudo apt upgrade
 
-Ensure that PIPX is installed.
+Install pipx and reload the shell
 
 .. code-block::
 
-    sudo apt install pipx
+    sudo apt install pipx -y; pipx ensurepath; exec "$SHELL" -l
 
-To install the most recent release from the Python Package Index, first install `pipx<https://pipx.pypa.io/stable/#install-pipx>`_
-
-.. code-block::
-
-    pipx ensurepath
-
-Ensure to run after installing pipx to make sure that the directory where pipx stores applications are included in your PATH. Make sure you close the terminal and reopen it for changes to take effect.
+Install development version of weathereye
 
 .. code-block::
 
-    pipx install weathereye
-
-To download and install the most recent updates from GitHub (note this installs all of WeatherEye's dependencies into your current environment):
-
-.. code-block::
-
+    cd ~
     git clone https://github.com/weather-eye/weathereye
-    pip install -e weathereye
+    pipx install ~/weathereye
 
+Run weathereye installer
+
+.. code-block::
+
+    wx install
 
 Features
 --------

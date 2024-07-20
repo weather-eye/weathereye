@@ -8,5 +8,10 @@ coverage==4.5.4
 Sphinx==1.8.5
 twine==1.14.0
 Click==7.1.2
-
+ansible==10.1.0
+redis==3.5.3
+celery==5.4.0 
+django==4.1 
+whitenoise==6.7.0
+ansible-runner==2.4.0'
 

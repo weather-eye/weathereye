@@ -23,13 +23,16 @@
 
   tasks:
   # shutdown old configuration sites that may still be running
-    - name: Shut down stale configuration site
+    - name: Cleanup tasks
       ansible.builtin.uri:
         url: http://localhost:52376/shutdown/
         method: GET
         force: true
         status_code: 200
       ignore_errors: true
+      no_log: true
+      register: result
+      failed_when: result.status == 'xxx' # if task returns a code that != 200, fail status not shown
 
   # downloading redis and pip on mac machines
     - name: Install required packages (MacOSX)
@@ -71,7 +74,7 @@
         virtualenv: "{{ venv_path }}"
 
   # starting configuration site
-    - name: Start configuration site
+    - name: configuration site
       community.general.django_manage:
         command: runserver localhost:52376
         project_path: "{{ django_webapp_path }}"
@@ -87,11 +90,13 @@
       async: 10800
       poll: 0
 
+  # wait 5 seconds for the server to start  
     - name: Wait for the server to start
       ansible.builtin.pause:
         seconds: 5
-
-    - name: Reload configuration site
+  
+  # start the configuration site
+    - name: Start configuration site
       ansible.builtin.uri:
         url: http://localhost:52376/
         method: GET

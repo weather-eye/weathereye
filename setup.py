@@ -10,12 +10,12 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['redis', 
-                'ansible', 
-                'django==4.1', 
-                'Click>=8.1.7', 
-                'celery>=4.0.0', 
-                'whitenoise>=6.7.0',
+requirements = ['redis',
+                'ansible',
+                'django==4.1',
+                'Click>=8.1.7',
+                'celery>=4.0.0',
+                'whitenoise>=6.7.0'
                 'ansible-runner==2.4.0',]
 
 test_requirements = [ ]

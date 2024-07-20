@@ -15,7 +15,7 @@ requirements = ['redis',
                 'django==4.1',
                 'Click>=8.1.7',
                 'celery>=4.0.0',
-                'whitenoise>=6.7.0'
+                'whitenoise>=6.7.0',
                 'ansible-runner==2.4.0',]
 
 test_requirements = [ ]

@@ -29,7 +29,7 @@ def install(sudo_password):
     if 'VIRTUAL_ENV' in os.environ:
         current_venv = os.path.basename(os.environ['VIRTUAL_ENV'])
         if current_venv == venv_name:
-            click.echo(click.style(f"Virtual environment '{venv_name}' is activated.", fg='green'))
+            click.echo(click.style(f"Using '{venv_name}' virtual environment!", fg='green'))
         else:
             click.echo(click.style(f"Warning: There is a problem with virtual environment: '{venv_name}'", fg='red'))
             click.echo(click.style("\nAttention, Run the following command before installing any packages with weathereye!", fg='yellow'))

@@ -71,6 +71,8 @@
                 
                 <a href="{% url 'terminate_task_by_id' celery_task_id=task_id %}" id="terminate_btn" class="button button-orange">Terminate Task</a>
 
+                <!-- <a href="http://0.0.0.0:8080/" id="surface_btn" class="button button-blue hide">Open Surface</a> -->
+
                 <!-- <a href="{ url 'retry-config' }" id="retry_btn" class="button button-orange hide"><i class="fa fa-repeat" aria-hidden="true"></i> Retry</a> -->
 
                 <a href="{% url 'shutdown' %}" class="button button-red">Exit</a>
@@ -105,6 +107,13 @@
                             // document.getElementById("retry_btn").classList.remove("hide");
                             
                             clearInterval(interval);
+                        }
+                        
+                        if (data.status === 'SUCCESS')
+                        {
+                            
+                            // document.getElementById("surface_btn").classList.remove("hide");
+
                         }
 
                         const outputElement = document.getElementById('output');
@@ -154,7 +163,7 @@
                                 progressBar.style.width = '100%';
                                 progressBar.style.backgroundColor = '#4caf50';
                                 progressBar.textContent = '100%';
-                                status.textContent = 'Loading Complete';
+                                status.textContent = 'Installation Complete! SURFACE can now be accessed at http://0.0.0.0:8080/';
                             } else if (progress <= 80) {
                                 percentage = Math.min(progress * 100 / 85, 100);
                                 progressBar.style.width = Math.floor(percentage) + '%';

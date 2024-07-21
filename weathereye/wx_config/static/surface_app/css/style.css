@@ -64,6 +64,16 @@ body {
     transform: scale(1.05);
   }
 
+  .button-blue {
+    background-color: #1e90ff;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+
+  .button-blue:hover {
+    background-color: #0a76e2;
+    transform: scale(1.05);
+  }
+
   .shutdown-h1 {
     font-size: 1.75rem;
     margin-bottom: 1.5rem;

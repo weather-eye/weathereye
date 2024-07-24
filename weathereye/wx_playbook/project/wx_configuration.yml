@@ -2,7 +2,6 @@
 - name: Check Supported Systems
   hosts: local
   gather_facts: true
-  become: false # granting root privileges
 
   tasks:
   # display Users system information
@@ -19,7 +18,7 @@
 
 - name: Configure SURFACE
   hosts: local
-  become: true # granting root privileges
+  gather_facts: false
 
   tasks:
   # shutdown old configuration sites that may still be running
@@ -41,7 +40,6 @@
         state: present
         update_homebrew: true
       when: ansible_distribution in ['MacOSX']
-      become: false
 
   # downloading redis and pip on ubuntu machines
     - name: Update apt cache
